@@ -15,10 +15,16 @@
      arm*)
        VAR_CPU=arm
        VAR_CPU_ARCH=arm
-@@ -60,6 +66,48 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
+@@ -54,6 +60,54 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
        VAR_CPU_BITS=64
        VAR_CPU_ENDIAN=little
        ;;
++    ia64)
++      VAR_CPU=ia64
++      VAR_CPU_ARCH=ia64
++      VAR_CPU_BITS=64
++      VAR_CPU_ENDIAN=little
++      ;;
 +    m68k)
 +      VAR_CPU=m68k
 +      VAR_CPU_ARCH=m68k
@@ -64,7 +70,7 @@
      powerpc)
        VAR_CPU=ppc
        VAR_CPU_ARCH=ppc
-@@ -78,6 +126,12 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
+@@ -72,6 +126,12 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
        VAR_CPU_BITS=64
        VAR_CPU_ENDIAN=little
        ;;
@@ -77,11 +83,12 @@
      s390)
        VAR_CPU=s390
        VAR_CPU_ARCH=s390
-@@ -377,6 +431,11 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
+@@ -371,6 +431,12 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
  
    # ZERO_ARCHDEF is used to enable architecture-specific code
    case "${OPENJDK_TARGET_CPU}" in
 +    alpha*)  ZERO_ARCHDEF=ALPHA ;;
++    ia64)  ZERO_ARCHDEF=IA64 ;;
 +    m68k)  ZERO_ARCHDEF=M68K ;;
 +    mips|mipsn32|mips64)  ZERO_ARCHDEF=MIPS ;;
 +    mipsel|mipsn32el|mips64el)  ZERO_ARCHDEF=MIPSEL ;;

@@ -18,7 +18,7 @@
  define_pd_global(uintx, JVMInvokeMethodSlack,    8192);
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -4846,6 +4846,7 @@ void os::init(void) {
+@@ -4934,6 +4934,7 @@ void os::init(void) {
  
    pthread_mutex_init(&dl_mutex, NULL);
  
@@ -26,7 +26,7 @@
    // If the pagesize of the VM is greater than 8K determine the appropriate
    // number of initial guard pages.  The user can change this with the
    // command line arguments, if needed.
-@@ -4854,6 +4855,7 @@ void os::init(void) {
+@@ -4942,6 +4943,7 @@ void os::init(void) {
      StackRedPages = 1;
      StackShadowPages = round_to((StackShadowPages*Linux::vm_default_page_size()), vm_page_size()) / vm_page_size();
    }
@@ -34,7 +34,7 @@
  }
  
  // To install functions for atexit system call
-@@ -4904,9 +4906,16 @@ jint os::init_2(void)
+@@ -4992,9 +4994,16 @@ jint os::init_2(void)
    // size.  Add a page for compiler2 recursion in main thread.
    // Add in 2*BytesPerWord times page size to account for VM stack during
    // class initialization depending on 32 or 64 bit VM.

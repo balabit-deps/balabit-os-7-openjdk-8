@@ -1,5 +1,31 @@
-openjdk-8 (8u171-b11-0ubuntu0.18.04.1) bionic-security; urgency=medium
+openjdk-8 (8u181-b13-0ubuntu0.18.04.1) bionic-security; urgency=medium
 
+  * Update to 8u181-b13. Hotspot 8u172-b11 for both aarch32 and aarch64.
+  * CVE-2018-2938, S8197871: Support Derby connections.
+  * CVE-2018-2952, S8199547: Exception to Pattern Syntax.
+  * S8191239: Improve desktop file usage.
+  * S8193419: Better Internet address support.
+  * S8197925: Better stack walking.
+  * S8200666: Improve LDAP support.
+  * debian/rules, debian/patches/sec-webrev-8u171-*: remove security patches
+    applied upstream.
+  * debian/patches/shebang.diff, debian/patches/zero-missing-headers.diff,
+    src/hotspot/share/interpreter/bytecodeInterpreter.cpp: applied upstream.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 23 Jul 2018 19:14:48 +0000
+
+openjdk-8 (8u171-b11-2) unstable; urgency=medium
+
+  * Update the zero-architectures patch for ia64 (Adrian Glaubitz).
+    Closes: #897066.
+  * Fix zero build on ia64 (Adrian Glaubitz). Closes: #897068.
+  * Refresh patches.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 17 May 2018 16:17:27 -0400
+
+openjdk-8 (8u171-b11-1) unstable; urgency=high
+
+  [ Tiago Stürmer Daitx ]
   * Update to 8u171-b11. Hotspot 8u162-b12 for aarch32 with 8u171-b10 hotspot
     security fixes and 8u171-b10 for aarch64.
     - CVE-2018-2790,S8189969: Manifest better manifest entries.
@@ -28,7 +54,10 @@ openjdk-8 (8u171-b11-0ubuntu0.18.04.1) bionic-security; urgency=medium
     d/p/hotspot-S8201509-zero-s390x-atomic_copy64-fix.patch: fix ppc32, s390x
     javac segmentation fault caused by wrong inline assembler.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 26 Apr 2018 15:59:34 +0000
+  [ Matthias Klose ]
+  * Bump standards version.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 27 Apr 2018 08:56:10 +0200
 
 openjdk-8 (8u162-b12-1) unstable; urgency=high
 

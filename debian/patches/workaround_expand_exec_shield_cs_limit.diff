@@ -11,7 +11,7 @@
     * Take the highest VA the OS will give us and exec
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -4933,7 +4933,7 @@ ZERO_ONLY (
+@@ -5021,7 +5021,7 @@ ZERO_ONLY (
  
    Linux::capture_initial_stack(JavaThread::stack_size_at_create());
  

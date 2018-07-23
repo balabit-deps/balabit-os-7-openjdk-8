@@ -9,11 +9,10 @@ Summary: In os_linux_zero.hpp the inline assembler for the S390 (S390 and not _L
 Reviewed-by: Duke
 Contributed-by: MBalao
 
-diff --git openjdk/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.hpp openjdk/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.hpp
---- openjdk/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.hpp
-+++ openjdk/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.hpp
-@@ -50,10 +50,10 @@
-                   : "Q"(*(volatile long*)src));
+--- a/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.hpp
++++ b/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.hpp
+@@ -44,10 +44,10 @@
+                   : "Q"(*(volatile double*)src));
  #elif defined(S390) && !defined(_LP64)
      double tmp;
 -    asm volatile ("ld  %0, 0(%1)\n"
@@ -25,5 +24,5 @@ diff --git openjdk/hotspot/src/os_cpu/linux_zero/vm/os_linux_zero.hpp openjdk/ho
 +                  : "=&f"(tmp), "=Q"(*(volatile double*)dst)
 +                  : "Q"(*(volatile double*)src));
  #else
-     *(jlong *) dst = *(const jlong *) src;
+     *(jlong *) dst = *(jlong *) src;
  #endif

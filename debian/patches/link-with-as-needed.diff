@@ -9,7 +9,7 @@
 -  UNPACKEXE_ZIPOBJS := -lz
 +  UNPACKEXE_LIBS := -lz
  else
-   UNPACKEXE_CFLAGS := -I$(JDK_TOPDIR)/src/share/native/java/util/zip/zlib-1.2.8
+   UNPACKEXE_CFLAGS := -I$(JDK_TOPDIR)/src/share/native/java/util/zip/zlib
    UNPACKEXE_ZIPOBJS := $(JDK_OUTPUTDIR)/objs/libzip/zcrc32$(OBJ_SUFFIX) \
 @@ -483,9 +483,9 @@ $(eval $(call SetupNativeCompilation,BUI
      LDFLAGS_posix := $(LDFLAGS_JDKEXE) $(LDFLAGS_CXX_JDK) \

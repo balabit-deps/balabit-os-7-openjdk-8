@@ -193,7 +193,7 @@
  
 --- a/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
 +++ b/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
-@@ -6509,7 +6509,7 @@ final public class AccessBridge extends
+@@ -6669,7 +6669,7 @@ final public class AccessBridge extends
          public AccessibleSelection getAccessibleSelection() {
              AccessibleContext ac = getCurrentAccessibleContext();
              if (ac != null && isLeaf) {
@@ -202,7 +202,7 @@
              } else {
                  return this;
              }
-@@ -6524,7 +6524,7 @@ final public class AccessBridge extends
+@@ -6684,7 +6684,7 @@ final public class AccessBridge extends
          public AccessibleText getAccessibleText() {
              AccessibleContext ac = getCurrentAccessibleContext();
              if (ac != null) {
@@ -211,7 +211,7 @@
              } else {
                  return null;
              }
-@@ -6539,7 +6539,7 @@ final public class AccessBridge extends
+@@ -6699,7 +6699,7 @@ final public class AccessBridge extends
          public AccessibleValue getAccessibleValue() {
              AccessibleContext ac = getCurrentAccessibleContext();
              if (ac != null) {

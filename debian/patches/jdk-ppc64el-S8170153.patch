@@ -7,10 +7,9 @@
 8170153: PPC64/s390x/aarch64: Poor StrictMath performance due to non-optimized compilation
 Reviewed-by: mdoerr, erikj, simonis, aph
 
-diff -r 71215ac21d10 -r 80927e772b9a make/lib/CoreLibraries.gmk
---- openjdk/jdk/make/lib/CoreLibraries.gmk	Thu Dec 15 09:03:36 2016 +0100
-+++ openjdk/jdk/make/lib/CoreLibraries.gmk	Thu Dec 15 07:58:15 2016 -0500
-@@ -27,6 +27,8 @@
+--- a/jdk/make/lib/CoreLibraries.gmk
++++ b/jdk/make/lib/CoreLibraries.gmk
+@@ -41,6 +41,8 @@ ifeq ($(OPENJDK_TARGET_OS), linux)
      BUILD_LIBFDLIBM_OPTIMIZATION := HIGH
    else ifeq ($(OPENJDK_TARGET_CPU), ppc64le)
      BUILD_LIBFDLIBM_OPTIMIZATION := HIGH
@@ -19,7 +18,7 @@ diff -r 71215ac21d10 -r 80927e772b9a make/lib/CoreLibraries.gmk
    endif
  endif
  
-@@ -44,6 +54,7 @@
+@@ -62,6 +64,7 @@ ifneq ($(OPENJDK_TARGET_OS), macosx)
        CFLAGS_aix := -qfloat=nomaf, \
        CFLAGS_linux_ppc64 := -mno-fused-madd -fno-strict-aliasing, \
        CFLAGS_linux_ppc64le := -ffp-contract=off, \

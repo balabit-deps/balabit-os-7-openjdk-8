@@ -1,10 +1,8 @@
 # DP: Set the hotspot default libpath to ignore lib64 and add multiarch
 
-Index: b/hotspot/src/os/linux/vm/os_linux.cpp
-===================================================================
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -328,10 +328,10 @@ void os::init_system_properties_values()
+@@ -316,10 +316,10 @@ void os::init_system_properties_values()
  //        1: ...
  //        ...
  //        7: The default directories, normally /lib and /usr/lib.
@@ -18,8 +16,6 @@ Index: b/hotspot/src/os/linux/vm/os_linux.cpp
  #endif
  
  // Base path of extensions installed on the system.
-Index: b/hotspot/make/linux/makefiles/vm.make
-===================================================================
 --- a/hotspot/make/linux/makefiles/vm.make
 +++ b/hotspot/make/linux/makefiles/vm.make
 @@ -99,6 +99,12 @@ CXXFLAGS =           \
