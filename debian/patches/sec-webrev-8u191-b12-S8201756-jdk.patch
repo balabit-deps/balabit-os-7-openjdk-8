@@ -1,0 +1,34 @@
+# HG changeset patch
+# User apetcher
+# Date 1524499306 14400
+#      Mon Apr 23 12:01:46 2018 -0400
+# Node ID 861623dfbd128e842eb52c2009640ecc80ec9d97
+# Parent  183336a30729a5c7f6a0fe256400b7822dd12d73
+8201756: Improve cipher inputs
+Summary: Clarify spec of CipherInputStream in Javadoc comments
+Reviewed-by: ascarpino
+
+diff -r 183336a30729 -r 861623dfbd12 src/share/classes/javax/crypto/CipherInputStream.java
+--- openjdk/jdk/src/share/classes/javax/crypto/CipherInputStream.java	Tue May 08 15:24:57 2018 -0700
++++ openjdk/jdk/src/share/classes/javax/crypto/CipherInputStream.java	Mon Apr 23 12:01:46 2018 -0400
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 1997, 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 1997, 2018, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -50,6 +50,13 @@
+  * that are not thrown by its ancestor classes.  In particular, the
+  * <code>skip</code> method skips, and the <code>available</code>
+  * method counts only data that have been processed by the encapsulated Cipher.
++ * This class may catch BadPaddingException and other exceptions thrown by
++ * failed integrity checks during decryption. These exceptions are not
++ * re-thrown, so the client may not be informed that integrity checks
++ * failed. Because of this behavior, this class may not be suitable
++ * for use with decryption in an authenticated mode of operation (e.g. GCM).
++ * Applications that require authenticated encryption can use the Cipher API
++ * directly as an alternative to using this class.
+  *
+  * <p> It is crucial for a programmer using this class not to use
+  * methods that are not defined or overriden in this class (such as a

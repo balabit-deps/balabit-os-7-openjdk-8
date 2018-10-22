@@ -1,5 +1,41 @@
-openjdk-8 (8u181-b13-0ubuntu0.18.04.1) bionic-security; urgency=medium
+openjdk-8 (8u181-b13-1ubuntu0.18.04.1) bionic-security; urgency=medium
 
+  * Backport from Cosmic.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 22 Oct 2018 17:29:08 +0000
+
+openjdk-8 (8u181-b13-1ubuntu0.18.10.1) cosmic-security; urgency=medium
+
+  * Apply patches from 8u191-b12 security update.
+    - CVE-2018-3136, S8194534: Manifest better support.
+    - CVE-2018-3139, S8196902: Better HTTP Redirection.
+    - CVE-2018-3149, S8199177: Enhance JNDI lookups.
+    - CVE-2018-3169, S8199226: Improve field accesses.
+    - CVE-2018-3180, S8202613: Improve TLS connections stability.
+    - CVE-2018-3183, S8202936: Improve script engine support.
+    - CVE-2018-3214, S8205361: Better RIFF reading support.
+    - CVE-2018-3211: Unspecified vulnerability in the Serviceability component.
+    - S8195868: Address Internet Addresses.
+    - S8195874: Improve jar specification adherence.
+    - S8201756: Improve cipher inputs.
+    - S8203654: Improve cypher state updates.
+    - S8204497: Better formatting of decimals.
+  * debian/patches/jdk-freetypeScaler-crash.diff: removed as this patch causes 
+    a memory leak; upstream fixed it in openjdk-7, albeit in a different way.
+    Closes: #910672.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 22 Oct 2018 17:25:20 +0000
+
+openjdk-8 (8u181-b13-1) unstable; urgency=high
+
+  * Update to 8u181-b13.
+  * Remove the mauve test machinery.
+  * Build using GCC 8 in development releases.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 04 Aug 2018 14:10:33 +0200
+
+openjdk-8 (8u181-b13-0ubuntu0.18.04.1) bionic-security; urgency=medium
+ 
   * Update to 8u181-b13. Hotspot 8u172-b11 for both aarch32 and aarch64.
   * CVE-2018-2938, S8197871: Support Derby connections.
   * CVE-2018-2952, S8199547: Exception to Pattern Syntax.

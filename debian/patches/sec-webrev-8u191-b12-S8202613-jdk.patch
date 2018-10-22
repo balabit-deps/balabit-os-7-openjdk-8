@@ -1,0 +1,172 @@
+# HG changeset patch
+# User igerasim
+# Date 1529015574 25200
+#      Thu Jun 14 15:32:54 2018 -0700
+# Node ID 7f473886abb45c71915441192b7efaba8d806b5b
+# Parent  2dff68c0c44fa54eadccabbc01119b5603c14e3d
+8202613: Improve TLS connections stability
+Reviewed-by: xuelei, wetmore
+
+diff -r 2dff68c0c44f -r 7f473886abb4 src/share/classes/sun/security/ssl/ClientHandshaker.java
+--- openjdk/jdk/src/share/classes/sun/security/ssl/ClientHandshaker.java	Thu Jun 14 12:37:19 2018 +0100
++++ openjdk/jdk/src/share/classes/sun/security/ssl/ClientHandshaker.java	Thu Jun 14 15:32:54 2018 -0700
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 1996, 2015, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 1996, 2018, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -711,7 +711,8 @@
+         session = new SSLSessionImpl(protocolVersion, cipherSuite,
+                             getLocalSupportedSignAlgs(),
+                             mesg.sessionId, getHostSE(), getPortSE(),
+-                            (extendedMasterSecretExt != null));
++                            (extendedMasterSecretExt != null),
++                            getEndpointIdentificationAlgorithmSE());
+         session.setRequestedServerNames(requestedServerNames);
+         setHandshakeSessionSE(session);
+         if (debug != null && Debug.isOn("handshake")) {
+@@ -1385,6 +1386,24 @@
+                 }
+             }
+ 
++            // ensure that the endpoint identification algorithm matches the
++            // one in the session
++            String identityAlg = getEndpointIdentificationAlgorithmSE();
++            if (session != null && identityAlg != null) {
++
++                String sessionIdentityAlg =
++                    session.getEndpointIdentificationAlgorithm();
++                if (!Objects.equals(identityAlg, sessionIdentityAlg)) {
++
++                    if (debug != null && Debug.isOn("session")) {
++                        System.out.println("%% can't resume, endpoint id" +
++                            " algorithm does not match, requested: " +
++                            identityAlg + ", cached: " + sessionIdentityAlg);
++                    }
++                    session = null;
++                }
++            }
++
+             if (session != null) {
+                 if (debug != null) {
+                     if (Debug.isOn("handshake") || Debug.isOn("session")) {
+diff -r 2dff68c0c44f -r 7f473886abb4 src/share/classes/sun/security/ssl/SSLSessionImpl.java
+--- openjdk/jdk/src/share/classes/sun/security/ssl/SSLSessionImpl.java	Thu Jun 14 12:37:19 2018 +0100
++++ openjdk/jdk/src/share/classes/sun/security/ssl/SSLSessionImpl.java	Thu Jun 14 15:32:54 2018 -0700
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 1996, 2017, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 1996, 2018, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -115,6 +115,10 @@
+     private Principal peerPrincipal;
+     private Principal localPrincipal;
+ 
++    // The endpoint identification algorithm used to check certificates
++    // in this session.
++    private final String              endpointIdentificationAlgorithm;
++
+     /*
+      * Is the session currently re-established with a session-resumption
+      * abbreviated initial handshake?
+@@ -146,7 +150,7 @@
+      */
+     private SSLSessionImpl() {
+         this(ProtocolVersion.NONE, CipherSuite.C_NULL, null,
+-            new SessionId(false, null), null, -1, false);
++            new SessionId(false, null), null, -1, false, null);
+     }
+ 
+     /*
+@@ -157,10 +161,10 @@
+     SSLSessionImpl(ProtocolVersion protocolVersion, CipherSuite cipherSuite,
+             Collection<SignatureAndHashAlgorithm> algorithms,
+             SecureRandom generator, String host, int port,
+-            boolean useExtendedMasterSecret) {
++            boolean useExtendedMasterSecret, String endpointIdAlgorithm) {
+         this(protocolVersion, cipherSuite, algorithms,
+              new SessionId(defaultRejoinable, generator), host, port,
+-             useExtendedMasterSecret);
++             useExtendedMasterSecret, endpointIdAlgorithm);
+     }
+ 
+     /*
+@@ -169,7 +173,8 @@
+     SSLSessionImpl(ProtocolVersion protocolVersion, CipherSuite cipherSuite,
+             Collection<SignatureAndHashAlgorithm> algorithms,
+             SessionId id, String host, int port,
+-            boolean useExtendedMasterSecret) {
++            boolean useExtendedMasterSecret,
++            String endpointIdAlgorithm){
+         this.protocolVersion = protocolVersion;
+         sessionId = id;
+         peerCerts = null;
+@@ -182,6 +187,7 @@
+         localSupportedSignAlgs =
+             SignatureAndHashAlgorithm.getAlgorithmNames(algorithms);
+         this.useExtendedMasterSecret = useExtendedMasterSecret;
++        this.endpointIdentificationAlgorithm = endpointIdAlgorithm;
+ 
+         if (debug != null && Debug.isOn("session")) {
+             System.out.println("%% Initialized:  " + this);
+@@ -247,6 +253,10 @@
+         localPrincipal = principal;
+     }
+ 
++    String getEndpointIdentificationAlgorithm() {
++        return this.endpointIdentificationAlgorithm;
++    }
++
+     /**
+      * Returns true iff this session may be resumed ... sessions are
+      * usually resumable.  Security policies may suggest otherwise,
+diff -r 2dff68c0c44f -r 7f473886abb4 src/share/classes/sun/security/ssl/ServerHandshaker.java
+--- openjdk/jdk/src/share/classes/sun/security/ssl/ServerHandshaker.java	Thu Jun 14 12:37:19 2018 +0100
++++ openjdk/jdk/src/share/classes/sun/security/ssl/ServerHandshaker.java	Thu Jun 14 15:32:54 2018 -0700
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 1996, 2017, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 1996, 2018, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -711,6 +711,25 @@
+                     }
+                 }
+ 
++                // ensure that the endpoint identification algorithm matches the
++                // one in the session
++                String identityAlg = getEndpointIdentificationAlgorithmSE();
++                if (resumingSession && identityAlg != null) {
++
++                    String sessionIdentityAlg =
++                    previous.getEndpointIdentificationAlgorithm();
++                    if (!Objects.equals(identityAlg, sessionIdentityAlg)) {
++
++                        if (debug != null && Debug.isOn("session")) {
++                            System.out.println("%% can't resume, endpoint id"
++                                + " algorithm does not match, requested: " +
++                                identityAlg + ", cached: " +
++                                sessionIdentityAlg);
++                        }
++                        resumingSession = false;
++                    }
++                }
++
+                 if (resumingSession) {
+                     CipherSuite suite = previous.getSuite();
+                     // verify that the ciphersuite from the cached session
+@@ -782,7 +801,8 @@
+                         sslContext.getSecureRandom(),
+                         getHostAddressSE(), getPortSE(),
+                         (requestedToUseEMS &&
+-                                (protocolVersion.v >= ProtocolVersion.TLS10.v)));
++                                (protocolVersion.v >= ProtocolVersion.TLS10.v)),
++                        getEndpointIdentificationAlgorithmSE());
+ 
+             if (protocolVersion.v >= ProtocolVersion.TLS12.v) {
+                 if (peerSupportedSignAlgs != null) {

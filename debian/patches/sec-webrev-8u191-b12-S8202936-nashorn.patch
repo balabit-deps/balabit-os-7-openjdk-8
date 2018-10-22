@@ -1,0 +1,40 @@
+# HG changeset patch
+# User rpatil
+# Date 1529434132 14400
+#      Tue Jun 19 14:48:52 2018 -0400
+# Node ID 2152c4a014454ac1d6a5839a9b304ed0a2b6d559
+# Parent  efdf56343d2788d1947d7fe89b4af07e185a006d
+8202936: Improve script engine support
+Reviewed-by: sundar
+
+diff -r efdf56343d27 -r 2152c4a01445 src/jdk/nashorn/internal/objects/Global.java
+--- openjdk/nashorn/src/jdk/nashorn/internal/objects/Global.java	Thu Jun 14 12:37:20 2018 +0100
++++ openjdk/nashorn/src/jdk/nashorn/internal/objects/Global.java	Tue Jun 19 14:48:52 2018 -0400
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -1427,13 +1427,14 @@
+             }
+         }
+ 
+-        switch (nameStr) {
+-        case "context":
++        if ("context".equals(nameStr)) {
+             return sctxt;
+-        case "engine":
+-            return global.engine;
+-        default:
+-            break;
++        } else if ("engine".equals(nameStr)) {
++            // expose "engine" variable only when there is no security manager
++            // or when no class filter is set.
++            if (System.getSecurityManager() == null || global.getClassFilter() == null) {
++                return global.engine;
++            }
+         }
+ 
+         if (self == UNDEFINED) {

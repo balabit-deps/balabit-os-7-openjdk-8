@@ -252,12 +252,12 @@ else ifneq (,$(filter $(distrel),wily xenial))
 else ifneq (,$(filter $(distrel),zesty stretch))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-6
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-6
-else ifneq (,$(filter $(distrel),sid buster artful))
+else ifneq (,$(filter $(distrel),artful bionic))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-7
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-7
 else
-  export CC = $(DEB_HOST_GNU_TYPE)-gcc-7
-  export CXX = $(DEB_HOST_GNU_TYPE)-g++-7
+  export CC = $(DEB_HOST_GNU_TYPE)-gcc-8
+  export CXX = $(DEB_HOST_GNU_TYPE)-g++-8
 endif
 
 ifneq (,$(filter $(DEB_HOST_ARCH), armel armhf))
@@ -348,7 +348,6 @@ COMMON_PATCHES = \
 	hotspot-no-march-i586.diff \
 	icc_loading_with_symlink.diff \
 	icedtea-override-redirect-compiz.patch \
-	jdk-freetypeScaler-crash.diff \
 	libpcsclite-dlopen.diff \
 	nonreparenting-wm.diff \
 	zero-fpu-control-is-noop.diff \
@@ -443,6 +442,21 @@ ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
 	kfreebsd-support-jdk.diff \
 	kfreebsd-support-hotspot.diff
 endif
+
+# 8u191 security update
+COMMON_PATCHES += \
+	sec-webrev-8u191-b12-S8194534-jdk.patch \
+	sec-webrev-8u191-b12-S8195868-jdk.patch \
+	sec-webrev-8u191-b12-S8195874-jdk.patch \
+	sec-webrev-8u191-b12-S8196902-jdk.patch \
+	sec-webrev-8u191-b12-S8199177-jdk.patch \
+	sec-webrev-8u191-b12-S8199226-hotspot.patch \
+	sec-webrev-8u191-b12-S8201756-jdk.patch \
+	sec-webrev-8u191-b12-S8202613-jdk.patch \
+	sec-webrev-8u191-b12-S8202936-nashorn.patch \
+	sec-webrev-8u191-b12-S8203654-jdk.patch \
+	sec-webrev-8u191-b12-S8204497-jaxp.patch \
+	sec-webrev-8u191-b12-S8205361-jdk.patch
 
 DEFAULT_PATCHES = \
 	$(COMMON_PATCHES) \
@@ -662,10 +676,10 @@ else ifneq (,$(filter $(distrel),wily xenial))
   bd_gcc = g++-5,
 else ifneq (,$(filter $(distrel),stretch zesty))
   bd_gcc = g++-6,
-else ifneq (,$(filter $(distrel),buster sid artful))
+else ifneq (,$(filter $(distrel),artful bionic))
   bd_gcc = g++-7,
 else
-  bd_gcc = g++-7,
+  bd_gcc = g++-8,
 endif
 bd_syslibs = zlib1g-dev, libattr1-dev,
 ifneq (,$(filter $(distrel),squeeze lucid))
@@ -722,7 +736,6 @@ endif
 
 bd_fastjar = fastjar (>= 2:0.96-0ubuntu2),
 bd_xvfb = xvfb, xauth, xfonts-base, libgl1-mesa-dri [!x32], $(bd_wm) x11-xkb-utils,
-bd_mauve = mauve,
 ifeq ($(with_pulse),yes)
   bd_pulsejava = libpulse-dev (>= 0.9.12) [!alpha],
 endif
@@ -902,7 +915,6 @@ debian/control: debian/control.in debian/rules
 	      -e 's/@bd_gcc@/$(bd_gcc)/g' \
 	      -e 's/@bd_syslibs@/$(bd_syslibs)/g' \
 	      -e 's/@bd_fastjar@/$(bd_fastjar)/g' \
-	      -e 's/@bd_mauve@/$(bd_mauve)/g' \
 	      -e 's/@bd_xvfb@/$(bd_xvfb)/g' \
 	      -e 's/@bd_pulsejava@/$(bd_pulsejava)/g' \
 	      -e 's/@bd_nss@/$(bd_nss)/g' \
@@ -1091,18 +1103,11 @@ stamps/patch: stamps/unpack
 	mv stamps/pxx $@
 
 ifeq ($(with_check),yes)
-    ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_archs) alpha ia64 mips mipsel mips64 mips64el powerpc powerpcspe ppc64 ppc64el sh4))
-      with_mauve_check = $(default_vm)
-    endif
     ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_archs) alpha arm64 armel armhf ia64 mips mipsel mips64 mips64el powerpc powerpcspe ppc64 ppc64el s390x sh4 x32))
       with_jtreg_check = $(default_vm)
     endif
 
     ifneq (,$(filter shark, $(alternate_vms)))
-      ifneq (,$(filter $(DEB_HOST_ARCH), amd64 i386 powerpc powerpcspe))
-	# only activate after testing
-	with_mauve_check += $(if $(filter $(DEB_HOST_ARCH),$(altshark_archs)),shark,zero)
-      endif
       # shark hangs on ppc64
       ifneq (,$(filter $(DEB_HOST_ARCH), amd64 i386 powerpc powerpcspe))
 	# only activate after testing; hangs several tests.
@@ -1111,17 +1116,11 @@ ifeq ($(with_check),yes)
     endif
 
     ifneq (,$(filter zero, $(alternate_vms)))
-      ifneq (,$(filter $(DEB_HOST_ARCH), amd64 i386))
-	# only activate after testing
-	with_mauve_check += zero
-      endif
       ifneq (,$(filter $(DEB_HOST_ARCH), arm64 amd64 i386))
 	# only activate after testing; hangs several tests.
 	with_jtreg_check += zero
       endif
     endif
-
-    with_mauve_check =
 endif
 
 # these are best guesses depending on the architecture and the build machines
@@ -1151,13 +1150,13 @@ endif
 build_stamps +=  stamps/jtreg-check-default
 
 ifeq (0,1)
-build_stamps +=  stamps/mauve-check-default stamps/jtreg-check-default
-build_stamps += $(if $(filter zero, $(alternate_vms)),stamps/mauve-check-zero stamps/jtreg-check-zero)
+build_stamps +=  stamps/jtreg-check-default
+build_stamps += $(if $(filter zero, $(alternate_vms)),stamps/jtreg-check-zero)
 ifneq (,$(filter shark, $(alternate_vms)))
   ifneq (,$(filter $(DEB_HOST_ARCH),$(altshark_archs)))
-    build_stamps += stamps/mauve-check-shark stamps/jtreg-check-shark
+    build_stamps += stamps/jtreg-check-shark
   else
-    build_stamps += stamps/mauve-check-zero stamps/jtreg-check-zero
+    build_stamps += stamps/jtreg-check-zero
   endif
 endif
 endif
@@ -1246,70 +1245,6 @@ endif
 XVFB_RUN_CMD = xvfb-run -a -e $(CURDIR)/test/xvfb-run.log -s "-extension GLX"
 ifneq (,$(wildcard /usr/bin/$(with_wm)))
   XVFB_RUN_CMD += $(CURDIR)/bin/my-jtreg-run
-endif
-
-stamps/mauve-check-default: stamps/build stamps/xvfb-check
-	$(MAKE) -f debian/rules mauve-run-check VMNAME=$(default_vm) VMARGS=
-	touch $@
-
-stamps/mauve-check-shark: stamps/xvfb-check
-	$(MAKE) -f debian/rules mauve-run-check VMNAME=shark VMARGS='-vmarg -shark'
-	touch $@
-
-stamps/mauve-check-zero: stamps/xvfb-check
-	$(MAKE) -f debian/rules mauve-run-check VMNAME=zero VMARGS='-vmarg -zero'
-	touch $@
-
-stamps/mauve-build: stamps/build
-	rm -rf build/mauve
-	mkdir -p build/mauve
-ifeq ($(with_mauve_check),yes)
-	tar -x -C build -f /usr/src/mauve.tar.gz
-	cd build/mauve \
-	    && aclocal \
-	    && automake \
-	    && autoconf \
-	    && PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH \
-		./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE)
-	PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH $(MAKE) -C build/mauve
-endif
-	touch $@
-
-stamps/mauve-check: stamps/build stamps/mauve-build stamps/xvfb-check
-
-mauve-run-check:
-	rm -rf build/mauve build/mauve-$(VMNAME)
-ifneq (,$(filter $(VMNAME), $(with_mauve_check)))
-	tar -x -C build -f /usr/src/mauve.tar.gz
-	mv build/mauve build/mauve-$(VMNAME)
-	cd build/mauve-$(VMNAME) \
-	    && aclocal \
-	    && automake \
-	    && autoconf \
-	    && PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH ./configure \
-		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE)
-	PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH $(MAKE) -C build/mauve-$(VMNAME)
-
-	if [ -f bin/my-xvfb-run ]; then \
-	  cd build/mauve-$(VMNAME) && \
-	    JAVA_HOME=$(CURDIR)/build/$(sdkimg) \
-	    PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH \
-		time /bin/sh $(CURDIR)/bin/my-xvfb-run java Harness \
-		    -vm $(CURDIR)/build/$(sdkimg)/bin/java \
-		    $(VMARGS) \
-		    -file $(CURDIR)/debian/mauve_tests \
-		    -timeout 30000 2>&1 \
-		| tee mauve_output-$(VMNAME); \
-	else \
-	  echo "mauve testsuite not run for this build (xvfb failures)" \
-	    > build/mauve-$(VMNAME)/mauve_output-$(VMNAME); \
-	  cat test/xvfb-run.log >> build/mauve-$(VMNAME)/mauve_output-$(VMNAME); \
-	fi
-	@sleep 5
-else
-	mkdir -p build/mauve-$(VMNAME)
-	echo "mauve testsuite not run for this build" \
-	  > build/mauve-$(VMNAME)/mauve_output-$(VMNAME)
 endif
 
 stamps/jtreg-check-default: stamps/build stamps/xvfb-check
@@ -2102,8 +2037,6 @@ shlibdeps_ld_path =$(absarchdir):$(absarchdir)/client:$(absarchdir)/server:$(abs
 # pass vm name as first argument
 define install_test_results
 	mkdir -p $(d_jdk)/usr/share/doc/$(p_jrehl)/test-$(DEB_HOST_ARCH)
-#	-cp mauve-$(1)/mauve_output-$(1) \
-#	  $(d_jdk)/usr/share/doc/$(p_jrehl)/test-$(DEB_HOST_ARCH)/mauve_output-$(1).log
 	-cp jtreg_output-$(1) \
 	  $(d_jdk)/usr/share/doc/$(p_jrehl)/test-$(DEB_HOST_ARCH)/jtreg_output-$(1).log
 	-cp test/jtreg-summary-$(1).log test/check-*-$(1).log \
@@ -2198,10 +2131,10 @@ ifneq ($(is_release),yes)
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u
-hg_tag_aarch64		= aarch64-jdk8u172-b11
+hg_tag_aarch64		= aarch64-jdk8u181-b14
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
-hg_tag_aarch32		= jdk8u172-b11-aarch32-180511
+hg_tag_aarch32		= jdk8u181-b13-aarch32-180802
 hg_url_aarch32		= http://hg.openjdk.java.net/aarch32-port/$(hg_project_aarch32)
 origdir			= ../openjdk-8-$(package_version).orig
 source_date		:= $(shell dpkg-parsechangelog --show-field=Date)
