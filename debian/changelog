@@ -1,3 +1,45 @@
+openjdk-8 (8u191-b12-0ubuntu0.18.04.1) bionic-security; urgency=medium
+
+  * Backport from Cosmic.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Tue, 20 Nov 2018 01:07:58 +0000
+
+openjdk-8 (8u191-b12-0ubuntu0.18.10.1) cosmic-security; urgency=medium
+
+  * Update to 8u191-b12. (Closes: #911925, LP: #1800792)
+  * debian/excludelist.jdk.jtx: no longer needed, using ProblemsList.txt
+    from upstream now.
+  * debian/excludelist.langtools.jtx: upstream testing does not use any
+    exclusion list.
+  * debian/patches/sec-webrev-8u191-b12*: removed, applied upstream.
+  * debian/patches/jdk-8132985-backport-double-free.patch,
+    debian/patches/jdk-8139803-backport-warning.patch: fix crash in
+    freetypescaler due to double free, thanks to Heikki Aitakangas for
+    the report and patches. (Closes: #911847)
+  * debian/rules:
+    - tar and save JTreport directory.
+    - run the same limited set of tests as upstream does.
+    - call the same testsuites scripts used for autopkgtest.
+    - reenable jdk testsuite.
+    - simplified and moved xvfb logic into check-jdk rule.
+    - removed jtreg and xvfb build dependency logic and moved the bdeps
+      into debian/control.in.
+    - added rules to generate autopkgtest scripts from templates.
+  * updated dep8 tests:
+    - debian/test/control: run hotspot, langtools, and jdk testsuites.
+    - debian/tests/hotspot, debian/tests/jdk, debian/tests/langtools:
+      add scripts for each testsuite to be run.
+    - debian/tests/jtreg-autopkgtest.sh: template to generate the jtreg
+      script used by the autopkgtest tests.
+    - debian/tests/jtdiff-autopkgtest.sh: used by the scripts to report
+      any differences between the autopkgtest and the tests results
+      generated during the openjdk package build.
+    - debian/tests/jtreg-autopkgtest.sh: used by the scripts to run jtreg
+      and put the resulting artifacts in the right places.
+    - debian/tests/valid-tests: removed, no longer needed.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 19 Nov 2018 11:02:46 +0000
+
 openjdk-8 (8u181-b13-1ubuntu0.18.04.1) bionic-security; urgency=medium
 
   * Backport from Cosmic.

@@ -6,6 +6,8 @@ XSBC-Original-Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
 Uploaders: Matthias Klose <doko@ubuntu.com>
 Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   sharutils, gawk, cpio, pkg-config, procps, wdiff, tzdata,
+  xvfb, xauth, xfonts-base, libgl1-mesa-dri [!x32], xfwm4, x11-xkb-utils, dbus-x11,
+  jtreg, time,
   @bd_fastjar@
   @bd_autotools@ @bd_ant@
   @bd_gcc@
@@ -14,8 +16,7 @@ Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   @bd_zero@ @bd_shark@
   @bd_syslibs@ @bd_pulsejava@ @bd_systemtap@
   @bd_nss@
-  @bd_jtreg@ @bd_xvfb@
-  time, @bd_cross@
+  @bd_cross@
 Standards-Version: 4.1.5
 Homepage: http://openjdk.java.net/
 Vcs-Bzr: http://bazaar.launchpad.net/~openjdk/openjdk/openjdk8

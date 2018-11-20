@@ -1,0 +1,31 @@
+#!/bin/bash
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+source <(dpkg-architecture -s)
+
+[ -d jdk/test/ ] || tar xf jdk.tar.xz jdk/test/
+
+cleanup() {
+  pid="$(jobs -p)"
+  [ -n "$pid" ] && pkill -P ${pid}
+  pkill -9 -P $$
+}
+
+trap "exit" INT TERM ERR
+trap "cleanup" EXIT
+
+export HOME="$(pwd)/jdk/test/"
+export XAUTHORITY="${HOME}/.Xauthority"
+
+export DISPLAY=:10
+debian/tests/start-xvfb.sh 10 &
+sleep 3
+
+debian/tests/jtreg-autopkgtest.sh -exclude:jdk/test/ProblemList.txt -dir:jdk/test \
+	:jdk_core :jdk_svc :jdk_beans :jdk_imageio :jdk_sound :jdk_sctp \
+	javax/accessibility com/sun/java/swing javax/print sun/pisces com/sun/awt
+
+debian/tests/jtdiff-autopkgtest.sh jdk

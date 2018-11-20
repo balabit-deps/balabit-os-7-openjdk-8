@@ -1,8 +1,7 @@
-Test-Command: debian/tests/jtreg-autopkgtest hotspot
-Depends: openjdk-8-jdk, jtreg, dpkg-dev, gcc
+Tests: hotspot, langtools
+Depends: @, jtreg, testng, dpkg-dev, gcc
+Restrictions: skippable
 
-Test-Command: debian/tests/jtreg-autopkgtest langtools
-Depends: openjdk-8-jdk, jtreg, dpkg-dev, gcc
-
-Test-Command: debian/tests/jtreg-autopkgtest jdk 
-Depends: openjdk-8-jdk, jtreg, dpkg-dev, gcc, xfwm4, xvfb
+Tests: jdk
+Depends: @, jtreg, testng, dpkg-dev, gcc, xfwm4, xvfb, dbus-x11
+Restrictions: skippable
