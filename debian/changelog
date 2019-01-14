@@ -1,12 +1,50 @@
-openjdk-8 (8u191-b12-0ubuntu0.18.04.1) bionic-security; urgency=medium
+openjdk-8 (8u191-b12-2ubuntu0.18.04.1) bionic-security; urgency=medium
 
-  * Backport from Cosmic.
+  * Backport from Disco.
+  * debian/control: regenerated.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Tue, 20 Nov 2018 01:07:58 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 14 Jan 2019 21:02:00 +0000
 
-openjdk-8 (8u191-b12-0ubuntu0.18.10.1) cosmic-security; urgency=medium
+openjdk-8 (8u191-b12-2ubuntu0.19.04.1) disco; urgency=medium
 
-  * Update to 8u191-b12. (Closes: #911925, LP: #1800792)
+  * Apply 11.0.2 security patches.
+  * Security fixes:
+    - CVE-2019-2422, S8206290: Better FileChannel transfer performance.
+    - CVE-2019-2426, S8209094: Improve web server connections.
+    - S8199156: Better route routing.
+    - S8199552: Update to build scripts.
+    - S8200659: Improve BigDecimal support.
+    - S8203955: Improve robot support.
+    - S8204895: Better icon support.
+    - S8205709: Proper allocation handling.
+    - S8205714: Initial class initialization.
+    - S8210094: Better loading of classloader classes.
+    - S8210606: Improved data set handling.
+    - S8210866: Improve JPEG processing.
+  * Update DEP8 tests:
+    - debian/tests/control: updated to allow stderr output and to remove
+      dpkg-dev dependency.
+    - debian/tests/jtdiff-autopkgtest.sh: use dpkg --print-architecture
+      instead of dpkg-architecture; log script name on any output.
+    - debian/tests/jtreg-autopkgtest.in: use dpkg --print-architecture instead
+      of dpkg-architecture; do not retain test temporary files; log script
+      name on any output.
+    - debian/tests/jtreg-autopkgtest.sh: regenerated.
+  * debian/patches/jdk-8u192-S8202261.patch: RandomAccessFile::setLength will
+    not shrink sparse files. (LP: #1811324)
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 14 Jan 2019 04:14:40 +0000
+
+openjdk-8 (8u191-b12-2) unstable; urgency=high
+
+  * Upload to unstable.
+  * Remove the "Team upload" for the last upload to experimental.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 05 Dec 2018 09:06:06 +0100
+
+openjdk-8 (8u191-b12-1) experimental; urgency=medium
+
+  * Update to 8u191-b12. (Closes: #911925, Closes: #912333, LP: #1800792)
   * debian/excludelist.jdk.jtx: no longer needed, using ProblemsList.txt
     from upstream now.
   * debian/excludelist.langtools.jtx: upstream testing does not use any
@@ -40,14 +78,9 @@ openjdk-8 (8u191-b12-0ubuntu0.18.10.1) cosmic-security; urgency=medium
 
  -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 19 Nov 2018 11:02:46 +0000
 
-openjdk-8 (8u181-b13-1ubuntu0.18.04.1) bionic-security; urgency=medium
+openjdk-8 (8u181-b13-2) unstable; urgency=high
 
-  * Backport from Cosmic.
-
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 22 Oct 2018 17:29:08 +0000
-
-openjdk-8 (8u181-b13-1ubuntu0.18.10.1) cosmic-security; urgency=medium
-
+  [ Tiago Stürmer Daitx ]
   * Apply patches from 8u191-b12 security update.
     - CVE-2018-3136, S8194534: Manifest better support.
     - CVE-2018-3139, S8196902: Better HTTP Redirection.
@@ -66,7 +99,10 @@ openjdk-8 (8u181-b13-1ubuntu0.18.10.1) cosmic-security; urgency=medium
     a memory leak; upstream fixed it in openjdk-7, albeit in a different way.
     Closes: #910672.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 22 Oct 2018 17:25:20 +0000
+  [ Matthias Klose ]
+  * Bump standards version.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 21 Oct 2018 12:23:32 +0200
 
 openjdk-8 (8u181-b13-1) unstable; urgency=high
 

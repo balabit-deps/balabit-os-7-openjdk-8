@@ -1,0 +1,20 @@
+# HG changeset patch
+# User serb
+# Date 1534897118 25200
+#      Tue Aug 21 17:18:38 2018 -0700
+# Node ID f8279bb6639f661ad8d7d30a80293e726bdb2056
+# Parent  5ba4548478b814dafe59bef2f7b5b41bcd90f624
+8203955: Improve robot support
+Reviewed-by: prr, psadhukhan, rhalade, skoivu
+
+diff -r 5ba4548478b8 -r f8279bb6639f src/share/classes/java/awt/Robot.java
+--- openjdk/jdk/src/share/classes/java/awt/Robot.java	Tue Aug 21 11:43:03 2018 +0530
++++ openjdk/jdk/src/share/classes/java/awt/Robot.java	Tue Aug 21 17:18:38 2018 -0700
+@@ -391,6 +391,7 @@
+      * @return  Color of the pixel
+      */
+     public synchronized Color getPixelColor(int x, int y) {
++        checkScreenCaptureAllowed();
+         Color color = new Color(peer.getRGBPixel(x, y));
+         return color;
+     }

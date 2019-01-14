@@ -17,7 +17,7 @@ Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   zlib1g-dev, libattr1-dev, libpng-dev, libjpeg-dev, libgif-dev, libpulse-dev (>= 0.9.12) [!alpha], systemtap-sdt-dev [!sh4],
   libnss3-dev (>= 2:3.17.1),
   openjdk-8-jdk-headless <cross>, dpkg-dev (>= 1.17.14),
-Standards-Version: 4.1.5
+Standards-Version: 4.2.1
 Homepage: http://openjdk.java.net/
 Vcs-Bzr: http://bazaar.launchpad.net/~openjdk/openjdk/openjdk8
 Vcs-Browser: https://code.launchpad.net/~openjdk/openjdk/openjdk8

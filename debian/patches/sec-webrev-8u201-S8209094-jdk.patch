@@ -1,0 +1,304 @@
+# HG changeset patch
+# User igerasim
+# Date 1539042688 25200
+#      Mon Oct 08 16:51:28 2018 -0700
+# Node ID d0d0b71e3a2a5c523a39fec29a50b262e215c6bf
+# Parent  baa7a736796bb24bf7988504f42ccffc4d02cbc3
+8209094: Improve web server connections
+Reviewed-by: chegar, dfuchs, mschoene, igerasim
+
+diff -r baa7a736796b -r d0d0b71e3a2a make/lib/NetworkingLibraries.gmk
+--- openjdk/jdk/make/lib/NetworkingLibraries.gmk	Mon Oct 08 15:24:21 2018 -0700
++++ openjdk/jdk/make/lib/NetworkingLibraries.gmk	Mon Oct 08 16:51:28 2018 -0700
+@@ -75,7 +75,7 @@
+     LDFLAGS_SUFFIX_linux := $(LIBDL) -ljvm -lpthread -ljava, \
+     LDFLAGS_SUFFIX_aix := $(LIBDL) -ljvm -ljava,\
+     LDFLAGS_SUFFIX_windows := ws2_32.lib jvm.lib secur32.lib iphlpapi.lib \
+-        delayimp.lib $(WIN_JAVA_LIB) advapi32.lib \
++        delayimp.lib urlmon.lib $(WIN_JAVA_LIB) advapi32.lib \
+         -DELAYLOAD:secur32.dll -DELAYLOAD:iphlpapi.dll, \
+     VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
+     RC_FLAGS := $(RC_FLAGS) \
+diff -r baa7a736796b -r d0d0b71e3a2a src/share/classes/sun/net/www/protocol/http/ntlm/NTLMAuthenticationCallback.java
+--- openjdk/jdk/src/share/classes/sun/net/www/protocol/http/ntlm/NTLMAuthenticationCallback.java	Mon Oct 08 15:24:21 2018 -0700
++++ openjdk/jdk/src/share/classes/sun/net/www/protocol/http/ntlm/NTLMAuthenticationCallback.java	Mon Oct 08 16:51:28 2018 -0700
+@@ -33,8 +33,7 @@
+  * credentials without prompting) should only be tried with trusted sites.
+  */
+ public abstract class NTLMAuthenticationCallback {
+-    private static volatile NTLMAuthenticationCallback callback =
+-            new DefaultNTLMAuthenticationCallback();
++    private static volatile NTLMAuthenticationCallback callback;
+ 
+     public static void setNTLMAuthenticationCallback(
+             NTLMAuthenticationCallback callback) {
+@@ -50,10 +49,5 @@
+      * transparent Authentication.
+      */
+     public abstract boolean isTrustedSite(URL url);
+-
+-    static class DefaultNTLMAuthenticationCallback extends NTLMAuthenticationCallback {
+-        @Override
+-        public boolean isTrustedSite(URL url) { return true; }
+-    }
+ }
+ 
+diff -r baa7a736796b -r d0d0b71e3a2a src/share/lib/net.properties
+--- openjdk/jdk/src/share/lib/net.properties	Mon Oct 08 15:24:21 2018 -0700
++++ openjdk/jdk/src/share/lib/net.properties	Mon Oct 08 16:51:28 2018 -0700
+@@ -1,5 +1,5 @@
+ ############################################################
+-#  	Default Networking Configuration File
++#       Default Networking Configuration File
+ #
+ # This file may contain default values for the networking system properties.
+ # These values are only used when the system properties are not specified
+@@ -14,7 +14,7 @@
+ # Note that the system properties that do explicitely set proxies
+ # (like http.proxyHost) do take precedence over the system settings
+ # even if java.net.useSystemProxies is set to true.
+- 
++
+ java.net.useSystemProxies=false
+ 
+ #------------------------------------------------------------------------
+@@ -66,8 +66,8 @@
+ # socksProxyPort=1080
+ #
+ # HTTP Keep Alive settings. remainingData is the maximum amount of data
+-# in kilobytes that will be cleaned off the underlying socket so that it 
+-# can be reused (default value is 512K), queuedConnections is the maximum 
++# in kilobytes that will be cleaned off the underlying socket so that it
++# can be reused (default value is 512K), queuedConnections is the maximum
+ # number of Keep Alive connections to be on the queue for clean up (default
+ # value is 10).
+ # http.KeepAlive.remainingData=512
+@@ -99,3 +99,23 @@
+ #jdk.http.auth.proxying.disabledSchemes=
+ jdk.http.auth.tunneling.disabledSchemes=Basic
+ 
++#
++# Transparent NTLM HTTP authentication mode on Windows. Transparent authentication
++# can be used for the NTLM scheme, where the security credentials based on the
++# currently logged in user's name and password can be obtained directly from the
++# operating system, without prompting the user. This property has three possible
++# values which regulate the behavior as shown below. Other unrecognized values
++# are handled the same as 'disabled'. Note, that NTLM is not considered to be a
++# strongly secure authentication scheme and care should be taken before enabling
++# this mechanism.
++#
++# Transparent authentication never used.
++#jdk.http.ntlm.transparentAuth=disabled
++#
++# Enabled for all hosts.
++#jdk.http.ntlm.transparentAuth=allHosts
++#
++# Enabled for hosts that are trusted in Windows Internet settings
++#jdk.http.ntlm.transparentAuth=trustedHosts
++#
++jdk.http.ntlm.transparentAuth=disabled
+diff -r baa7a736796b -r d0d0b71e3a2a src/solaris/classes/sun/net/www/protocol/http/ntlm/NTLMAuthentication.java
+--- openjdk/jdk/src/solaris/classes/sun/net/www/protocol/http/ntlm/NTLMAuthentication.java	Mon Oct 08 15:24:21 2018 -0700
++++ openjdk/jdk/src/solaris/classes/sun/net/www/protocol/http/ntlm/NTLMAuthentication.java	Mon Oct 08 16:51:28 2018 -0700
+@@ -90,10 +90,13 @@
+ 
+     /**
+      * Returns true if the given site is trusted, i.e. we can try
+-     * transparent Authentication.
++     * transparent Authentication. Shouldn't be called since
++     * capability not supported on Unix
+      */
+     public static boolean isTrustedSite(URL url) {
+-        return NTLMAuthCallback.isTrustedSite(url);
++        if (NTLMAuthCallback != null)
++            return NTLMAuthCallback.isTrustedSite(url);
++        return false;
+     }
+ 
+     private void init0() {
+diff -r baa7a736796b -r d0d0b71e3a2a src/windows/classes/sun/net/www/protocol/http/ntlm/NTLMAuthentication.java
+--- openjdk/jdk/src/windows/classes/sun/net/www/protocol/http/ntlm/NTLMAuthentication.java	Mon Oct 08 15:24:21 2018 -0700
++++ openjdk/jdk/src/windows/classes/sun/net/www/protocol/http/ntlm/NTLMAuthentication.java	Mon Oct 08 16:51:28 2018 -0700
+@@ -30,6 +30,7 @@
+ import java.net.PasswordAuthentication;
+ import java.net.UnknownHostException;
+ import java.net.URL;
++import sun.net.NetProperties;
+ import sun.net.www.HeaderParser;
+ import sun.net.www.protocol.http.AuthenticationInfo;
+ import sun.net.www.protocol.http.AuthScheme;
+@@ -52,6 +53,14 @@
+     private static String defaultDomain; /* Domain to use if not specified by user */
+     private static final boolean ntlmCache; /* Whether cache is enabled for NTLM */
+ 
++    enum TransparentAuth {
++        DISABLED,      // disable for all hosts (default)
++        TRUSTED_HOSTS, // use Windows trusted hosts settings
++        ALL_HOSTS      // attempt for all hosts
++    }
++
++    private static final TransparentAuth authMode;
++
+     static {
+         defaultDomain = java.security.AccessController.doPrivileged(
+             new sun.security.action.GetPropertyAction("http.auth.ntlm.domain",
+@@ -59,6 +68,19 @@
+         String ntlmCacheProp = java.security.AccessController.doPrivileged(
+             new sun.security.action.GetPropertyAction("jdk.ntlm.cache", "true"));
+         ntlmCache = Boolean.parseBoolean(ntlmCacheProp);
++        String modeProp = java.security.AccessController.doPrivileged(
++            new java.security.PrivilegedAction<String>() {
++                public String run() {
++                    return NetProperties.get("jdk.http.ntlm.transparentAuth");
++                }
++            });
++
++        if ("trustedHosts".equalsIgnoreCase(modeProp))
++            authMode = TransparentAuth.TRUSTED_HOSTS;
++        else if ("allHosts".equalsIgnoreCase(modeProp))
++            authMode = TransparentAuth.ALL_HOSTS;
++        else
++            authMode = TransparentAuth.DISABLED;
+     };
+ 
+     private void init0() {
+@@ -159,9 +181,21 @@
+      * transparent Authentication.
+      */
+     public static boolean isTrustedSite(URL url) {
+-        return NTLMAuthCallback.isTrustedSite(url);
++        if (NTLMAuthCallback != null)
++            return NTLMAuthCallback.isTrustedSite(url);
++
++        switch (authMode) {
++            case TRUSTED_HOSTS:
++                return isTrustedSite(url.toString());
++            case ALL_HOSTS:
++                return true;
++            default:
++                return false;
++        }
+     }
+ 
++    static native boolean isTrustedSite(String url);
++
+     /**
+      * Not supported. Must use the setHeaders() method
+      */
+@@ -211,5 +245,4 @@
+             return false;
+         }
+     }
+-
+ }
+diff -r baa7a736796b -r d0d0b71e3a2a src/windows/native/sun/net/www/protocol/http/ntlm/NTLMAuthentication.c
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ openjdk/jdk/src/windows/native/sun/net/www/protocol/http/ntlm/NTLMAuthentication.c	Mon Oct 08 16:51:28 2018 -0700
+@@ -0,0 +1,107 @@
++/*
++ * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 only, as
++ * published by the Free Software Foundation.  Oracle designates this
++ * particular file as subject to the "Classpath" exception as provided
++ * by Oracle in the LICENSE file that accompanied this code.
++ *
++ * This code is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * version 2 for more details (a copy is included in the LICENSE file that
++ * accompanied this code).
++ *
++ * You should have received a copy of the GNU General Public License version
++ * 2 along with this work; if not, write to the Free Software Foundation,
++ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
++ *
++ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
++ * or visit www.oracle.com if you need additional information or have any
++ * questions.
++ */
++
++#include <jni.h>
++#include <windows.h>
++#include "jni_util.h"
++#include <urlmon.h>
++
++JNIEXPORT jboolean JNICALL Java_sun_net_www_protocol_http_ntlm_NTLMAuthentication_isTrustedSite(JNIEnv *env, jclass clazz, jstring url )
++{
++
++    HRESULT hr;
++    DWORD dwZone;
++    DWORD  pPolicy = 0;
++    IInternetSecurityManager *spSecurityManager;
++    jboolean ret;
++    LPCWSTR bstrURL;
++
++    // Create IInternetSecurityManager
++    hr = CoInternetCreateSecurityManager(NULL, &spSecurityManager, (DWORD)0);
++    if (FAILED(hr)) {
++        return JNI_FALSE;
++    }
++
++    bstrURL = (LPCWSTR)((*env)->GetStringChars(env, url, NULL));
++    if (bstrURL == NULL) {
++        if (!(*env)->ExceptionCheck(env))
++            JNU_ThrowOutOfMemoryError(env, NULL);
++        spSecurityManager->lpVtbl->Release(spSecurityManager);
++        return JNI_FALSE;
++    }
++
++    // Determines the policy for the URLACTION_CREDENTIALS_USE action and display
++    // a user interface, if the policy indicates that the user should be queried
++    hr = spSecurityManager->lpVtbl->ProcessUrlAction(
++        spSecurityManager,
++        bstrURL,
++        URLACTION_CREDENTIALS_USE,
++        (LPBYTE)&pPolicy,
++        sizeof(DWORD), 0, 0, 0, 0);
++
++    if (FAILED(hr)) {
++        ret = JNI_FALSE;
++        goto cleanupAndReturn;
++    }
++
++    // If these two User Authentication Logon options is selected
++    // Anonymous logon
++    // Prompt for user name and password
++    if (pPolicy == URLPOLICY_CREDENTIALS_ANONYMOUS_ONLY ||
++        pPolicy == URLPOLICY_CREDENTIALS_MUST_PROMPT_USER) {
++        ret = JNI_FALSE;
++        goto cleanupAndReturn;
++    }
++
++    // Option "Automatic logon with current user name and password" is selected
++    if (pPolicy == URLPOLICY_CREDENTIALS_SILENT_LOGON_OK) {
++        ret = JNI_TRUE;
++        goto cleanupAndReturn;
++    }
++
++    // Option "Automatic logon only in intranet zone" is selected
++    if (pPolicy == URLPOLICY_CREDENTIALS_CONDITIONAL_PROMPT) {
++
++        // Gets the zone index from the specified URL
++        hr = spSecurityManager->lpVtbl->MapUrlToZone(
++                spSecurityManager, bstrURL, &dwZone, 0);
++        if (FAILED(hr)) {
++            ret = JNI_FALSE;
++            goto cleanupAndReturn;
++        }
++
++        // Check if the URL is in Local or Intranet zone
++        if (dwZone == URLZONE_INTRANET || dwZone == URLZONE_LOCAL_MACHINE) {
++            ret = JNI_TRUE;
++            goto cleanupAndReturn;
++        }
++    }
++    ret = JNI_FALSE;
++
++cleanupAndReturn:
++    (*env)->ReleaseStringChars(env, url, bstrURL);
++    spSecurityManager->lpVtbl->Release(spSecurityManager);
++    return ret;
++}

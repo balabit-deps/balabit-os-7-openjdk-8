@@ -1,0 +1,27 @@
+# HG changeset patch
+# User serb
+# Date 1536633076 25200
+#      Mon Sep 10 19:31:16 2018 -0700
+# Node ID c781c1726b62bc5c37c1fd1e4e62eadace75111b
+# Parent  d8b98efabf5740af89e495c4b7d03e48d229d1c3
+8204895: Better icon support
+Reviewed-by: prr, mschoene, aghaisas, rhalade
+
+diff -r d8b98efabf57 -r c781c1726b62 src/solaris/native/sun/awt/awt_UNIXToolkit.c
+--- openjdk/jdk/src/solaris/native/sun/awt/awt_UNIXToolkit.c	Mon Sep 10 19:37:53 2018 +0100
++++ openjdk/jdk/src/solaris/native/sun/awt/awt_UNIXToolkit.c	Mon Sep 10 19:31:16 2018 -0700
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2004, 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2004, 2018, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -209,6 +209,7 @@
+         detail_str = (char *)SAFE_SIZE_ARRAY_ALLOC(malloc,
+                 sizeof(char), len + 1);
+         if (detail_str == NULL) {
++            free(stock_id_str);
+             JNU_ThrowOutOfMemoryError(env, "OutOfMemoryError");
+             return JNI_FALSE;
+         }

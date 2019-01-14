@@ -365,6 +365,7 @@ COMMON_PATCHES = \
 	hotspot-ia64.diff \
 	jdk-8132985-backport-double-free.patch \
 	jdk-8139803-backport-warning.patch \
+	jdk-8u192-S8202261.patch \
 
 ifeq ($(derivative),Debian)
   COMMON_PATCHES += \
@@ -426,6 +427,19 @@ ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
 	kfreebsd-support-jdk.diff \
 	kfreebsd-support-hotspot.diff
 endif
+
+# 8u201 security patches
+COMMON_PATCHES += \
+	sec-webrev-8u201-S8199156-jdk.patch \
+	sec-webrev-8u201-S8200659-jdk.patch \
+	sec-webrev-8u201-S8203955-jdk.patch \
+	sec-webrev-8u201-S8204895-jdk.patch \
+	sec-webrev-8u201-S8205709-jdk.patch \
+	sec-webrev-8u201-S8205714-hotspot.patch \
+	sec-webrev-8u201-S8206290-jdk.patch \
+	sec-webrev-8u201-S8208585-jdk.patch \
+	sec-webrev-8u201-S8209094-jdk.patch \
+	sec-webrev-8u201-S8210094-hotspot.patch
 
 DEFAULT_PATCHES = \
 	$(COMMON_PATCHES) \
@@ -1959,17 +1973,17 @@ endif
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u191-b12
+hg_tag			= jdk8u192-b26
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u-shenandoah
-hg_tag_aarch64		= aarch64-shenandoah-jdk8u191-b12
+hg_tag_aarch64		= aarch64-shenandoah-jdk8u191-b13
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
-hg_tag_aarch32		= jdk8u191-b12-aarch32-181022
+hg_tag_aarch32		= jdk8u192-b12-aarch32-181022
 hg_url_aarch32		= http://hg.openjdk.java.net/aarch32-port/$(hg_project_aarch32)
 origdir			= ../openjdk-8-$(package_version).orig
 source_date		:= $(shell dpkg-parsechangelog --show-field=Date)
