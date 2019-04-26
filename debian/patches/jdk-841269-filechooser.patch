@@ -1,6 +1,6 @@
---- openjdk/jdk/src/share/classes/sun/awt/shell/ShellFolder.java  2016-10-19 11:41:05.669056845 +0530
-+++ openjdk/jdk/src/share/classes/sun/awt/shell/ShellFolder.java  2016-10-19 11:44:37.957056845 +0530
-@@ -30,6 +30,10 @@
+--- a/jdk/src/share/classes/sun/awt/shell/ShellFolder.java
++++ b/jdk/src/share/classes/sun/awt/shell/ShellFolder.java
+@@ -30,6 +30,10 @@ import java.awt.Image;
  import java.awt.Toolkit;
  import java.io.*;
  import java.io.FileNotFoundException;
@@ -10,8 +10,8 @@
 +import java.nio.file.Paths;
  import java.util.*;
  import java.util.concurrent.Callable;
-
-@@ -240,10 +244,11 @@
+ 
+@@ -240,10 +244,11 @@ public abstract class ShellFolder extend
       * @exception FileNotFoundException if file does not exist
       */
      public static ShellFolder getShellFolder(File file) throws FileNotFoundException {

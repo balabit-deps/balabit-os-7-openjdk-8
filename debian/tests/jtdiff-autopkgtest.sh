@@ -14,12 +14,17 @@ fi
 
 host_arch=${DEB_HOST_ARCH:-$(dpkg --print-architecture)}
 
-export JTREG_HOME=/usr/share/java
-export JT_JAVA="${JT_JAVA:-/usr/lib/jvm/java-8-openjdk-${host_arch}}"
+# don't mess around with JT_* env vars. If JDK_TO_TEST is set, then the
+# script is called from the build, if not, from the autopkg tests
+if [ -z "$JDK_TO_TEST" ]; then
+  JDK_TO_TEST=@JDK_TO_TEST@
+fi
+JVERSION=$($JDK_TO_TEST/bin/java -version 2>&1| sed -n '1s/.*"\(.*\)".*/\1/p')
+JMAJOR=$(echo $JVERSION | sed 's/\..*//')
 
 vmname=${VMNAME:-hotspot}
 
-jt_report_tb="/usr/share/doc/openjdk-8-jdk/test-${host_arch}/jtreport-${vmname}.tar.gz"
+jt_report_tb="/usr/share/doc/openjdk-$JMAJOR-jdk/test-${host_arch}/jtreport-${vmname}.tar.gz"
 build_report_dir="${AUTOPKGTEST_TMP}/jtreg-test-output/${testsuite}/JTreport"
 
 if [ ! -f "${jt_report_tb}" ]; then

@@ -8,10 +8,9 @@ Summary: Check for "aarch64" along with other unaligned access supporting archit
 Reviewed-by: andrew
 Contributed-by: Derek White <Derek.White@cavium.com>
 
-diff -r 0c14af84f624 -r 64e09337b9b7 src/share/classes/java/nio/Bits.java
---- openjdk/jdk/src/share/classes/java/nio/Bits.java	Fri Jul 14 07:29:12 2017 +0100
-+++ openjdk/jdk/src/share/classes/java/nio/Bits.java	Fri Aug 11 01:05:45 2017 +0100
-@@ -615,7 +615,8 @@
+--- a/jdk/src/share/classes/java/nio/Bits.java
++++ b/jdk/src/share/classes/java/nio/Bits.java
+@@ -615,7 +615,8 @@ class Bits {
              new sun.security.action.GetPropertyAction("os.arch"));
          unaligned = arch.equals("i386") || arch.equals("x86")
              || arch.equals("amd64") || arch.equals("x86_64")
@@ -21,10 +20,9 @@ diff -r 0c14af84f624 -r 64e09337b9b7 src/share/classes/java/nio/Bits.java
          unalignedKnown = true;
          return unaligned;
      }
-diff -r 0c14af84f624 -r 64e09337b9b7 src/share/classes/sun/security/provider/ByteArrayAccess.java
---- openjdk/jdk/src/share/classes/sun/security/provider/ByteArrayAccess.java	Fri Jul 14 07:29:12 2017 +0100
-+++ openjdk/jdk/src/share/classes/sun/security/provider/ByteArrayAccess.java	Fri Aug 11 01:05:45 2017 +0100
-@@ -94,7 +94,8 @@
+--- a/jdk/src/share/classes/sun/security/provider/ByteArrayAccess.java
++++ b/jdk/src/share/classes/sun/security/provider/ByteArrayAccess.java
+@@ -94,7 +94,8 @@ final class ByteArrayAccess {
          String arch = java.security.AccessController.doPrivileged
              (new sun.security.action.GetPropertyAction("os.arch", ""));
          return arch.equals("i386") || arch.equals("x86") || arch.equals("amd64")
@@ -34,4 +32,3 @@ diff -r 0c14af84f624 -r 64e09337b9b7 src/share/classes/sun/security/provider/Byt
      }
  
      /**
-

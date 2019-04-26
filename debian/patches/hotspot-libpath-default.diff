@@ -2,7 +2,7 @@
 
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -316,10 +316,10 @@ void os::init_system_properties_values()
+@@ -366,10 +366,10 @@ void os::init_system_properties_values()
  //        1: ...
  //        ...
  //        7: The default directories, normally /lib and /usr/lib.

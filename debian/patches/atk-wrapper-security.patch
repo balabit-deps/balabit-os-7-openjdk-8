@@ -1,5 +1,3 @@
-Index: b/jdk/src/share/lib/security/java.security-linux
-===================================================================
 --- a/jdk/src/share/lib/security/java.security-linux
 +++ b/jdk/src/share/lib/security/java.security-linux
 @@ -186,6 +186,7 @@ keystore.type.compat=true

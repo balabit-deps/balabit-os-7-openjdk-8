@@ -1,6 +1,6 @@
 --- a/common/autoconf/libraries.m4
 +++ b/common/autoconf/libraries.m4
-@@ -747,6 +747,53 @@ AC_DEFUN_ONCE([LIB_SETUP_MISC_LIBS],
+@@ -926,6 +926,53 @@ AC_DEFUN_ONCE([LIB_SETUP_MISC_LIBS],
  
    ###############################################################################
    #
@@ -56,7 +56,7 @@
  
 --- a/common/autoconf/spec.gmk.in
 +++ b/common/autoconf/spec.gmk.in
-@@ -569,6 +569,7 @@ ENABLE_INTREE_EC=@ENABLE_INTREE_EC@
+@@ -573,6 +573,7 @@ ENABLE_INTREE_EC=@ENABLE_INTREE_EC@
  USE_EXTERNAL_LIBJPEG:=@USE_EXTERNAL_LIBJPEG@
  USE_EXTERNAL_LIBPNG:=@USE_EXTERNAL_LIBPNG@
  USE_EXTERNAL_LIBGIF:=@USE_EXTERNAL_LIBGIF@

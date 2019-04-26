@@ -14,18 +14,16 @@
    fi
  
    JVM_VARIANTS=",$with_jvm_variants,"
-@@ -158,7 +162,10 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_JVM_VARIANTS
-   if test "x$JVM_VARIANT_ZEROSHARK" = xtrue ; then
+@@ -161,6 +165,9 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_JVM_VARIANTS
+   if test "x$VAR_CPU" = xppc64 -o "x$VAR_CPU" = xppc64le ; then
      INCLUDE_SA=false
    fi
--  if test "x$VAR_CPU" = xppc64 ; then
-+  if test "x$OPENJDK_TARGET_CPU" = xppc64; then
++  if test "x$OPENJDK_TARGET_CPU" = xaarch32; then
 +    INCLUDE_SA=false
 +  fi
-+  if test "x$OPENJDK_TARGET_CPU" = xaarch32; then
+   if test "x$OPENJDK_TARGET_CPU" = xaarch64; then
      INCLUDE_SA=false
    fi
-   if test "x$OPENJDK_TARGET_CPU" = xaarch64; then
 --- a/common/autoconf/platform.m4
 +++ b/common/autoconf/platform.m4
 @@ -56,8 +56,8 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
@@ -39,7 +37,7 @@
        VAR_CPU_BITS=32
        VAR_CPU_ENDIAN=little
        ;;
-@@ -338,6 +338,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
+@@ -346,6 +346,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
    elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
      # On all platforms except MacOSX replace x86_64 with amd64.
      OPENJDK_TARGET_CPU_LEGACY="amd64"
@@ -48,7 +46,7 @@
    fi
    AC_SUBST(OPENJDK_TARGET_CPU_LEGACY)
  
-@@ -348,6 +350,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
+@@ -356,6 +358,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
      OPENJDK_TARGET_CPU_LEGACY_LIB="i386"
    elif test "x$OPENJDK_TARGET_CPU" = xx86_64; then
      OPENJDK_TARGET_CPU_LEGACY_LIB="amd64"
@@ -57,7 +55,7 @@
    fi
    AC_SUBST(OPENJDK_TARGET_CPU_LEGACY_LIB)
  
-@@ -381,6 +385,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
+@@ -389,6 +393,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
    elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
      # On all platforms except macosx, we replace x86_64 with amd64.
      OPENJDK_TARGET_CPU_OSARCH="amd64"
@@ -66,7 +64,7 @@
    fi
    AC_SUBST(OPENJDK_TARGET_CPU_OSARCH)
  
-@@ -390,6 +396,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
+@@ -398,6 +404,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
    elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
      # On all platforms except macosx, we replace x86_64 with amd64.
      OPENJDK_TARGET_CPU_JLI="amd64"
@@ -77,7 +75,7 @@
    OPENJDK_TARGET_CPU_JLI_CFLAGS="-DLIBARCHNAME='\"$OPENJDK_TARGET_CPU_JLI\"'"
 --- a/jdk/make/CopyFiles.gmk
 +++ b/jdk/make/CopyFiles.gmk
-@@ -307,9 +307,15 @@ else
+@@ -328,9 +328,15 @@ else
    ifeq ($(CLIENT_AND_SERVER), true)
      COPY_JVM_CFG_FILE := true
    else
@@ -108,7 +106,7 @@
          LIBRARY := sctp, \
 --- a/jdk/make/lib/SoundLibraries.gmk
 +++ b/jdk/make/lib/SoundLibraries.gmk
-@@ -143,6 +143,10 @@ else
+@@ -147,6 +147,10 @@ else
    ifeq ($(OPENJDK_TARGET_CPU), aarch64)
  	LIBJSOUND_CFLAGS += -DX_ARCH=X_AARCH64
    endif
@@ -121,11 +119,11 @@
  LIBJSOUND_CFLAGS += -DEXTRA_SOUND_JNI_LIBS='"$(EXTRA_SOUND_JNI_LIBS)"'
 --- a/jdk/src/share/native/com/sun/media/sound/SoundDefs.h
 +++ b/jdk/src/share/native/com/sun/media/sound/SoundDefs.h
-@@ -44,6 +44,7 @@
- #define X_ARM           7
- #define X_PPC           8
- #define X_AARCH64       9
-+#define X_AARCH32      10
+@@ -46,6 +46,7 @@
+ #define X_PPC64         9
+ #define X_PPC64LE      10
+ #define X_AARCH64      11
++#define X_AARCH32      12
  
  // **********************************
  // Make sure you set X_PLATFORM and X_ARCH defines correctly.
@@ -168,7 +166,7 @@
 +-client IGNORE
 --- a/hotspot/make/defs.make
 +++ b/hotspot/make/defs.make
-@@ -328,6 +328,11 @@ ifneq ($(OSNAME),windows)
+@@ -333,6 +333,11 @@ ifneq ($(OSNAME),windows)
    LIBARCH/ppc64   = ppc64
    LIBARCH/aarch32 = aarch32
  

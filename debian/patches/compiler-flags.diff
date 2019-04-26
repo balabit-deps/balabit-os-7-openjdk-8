@@ -2,7 +2,7 @@
 
 --- a/hotspot/make/linux/makefiles/ppc64.make
 +++ b/hotspot/make/linux/makefiles/ppc64.make
-@@ -47,5 +47,5 @@
+@@ -47,5 +47,5 @@ else
    CFLAGS += -DVM_LITTLE_ENDIAN -DABI_ELFv2
  
    # Use Power8, this is the first CPU to support PPC64 LE with ELFv2 ABI.

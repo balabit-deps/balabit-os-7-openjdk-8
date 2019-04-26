@@ -2,7 +2,7 @@
 
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -1915,7 +1915,7 @@ void * os::dll_load(const char *filename
+@@ -1975,7 +1975,7 @@ void * os::dll_load(const char *filename
  
    #if  (defined IA32)
      static  Elf32_Half running_arch_code=EM_386;
@@ -55,7 +55,7 @@
        ;;
      i?86)
        VAR_CPU=x86
-@@ -447,7 +454,13 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
+@@ -449,7 +456,13 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
      ppc64)   ZERO_ARCHDEF=PPC64 ;;
      s390*)   ZERO_ARCHDEF=S390  ;;
      sparc*)  ZERO_ARCHDEF=SPARC ;;

@@ -1,6 +1,6 @@
 --- a/jdk/src/share/classes/javax/swing/JTree.java
 +++ b/jdk/src/share/classes/javax/swing/JTree.java
-@@ -4962,7 +4962,7 @@ public class JTree extends JComponent im
+@@ -4969,7 +4969,7 @@ public class JTree extends JComponent im
              public AccessibleSelection getAccessibleSelection() {
                  AccessibleContext ac = getCurrentAccessibleContext();
                  if (ac != null && isLeaf) {
@@ -9,7 +9,7 @@
                  } else {
                      return this;
                  }
-@@ -4977,7 +4977,7 @@ public class JTree extends JComponent im
+@@ -4984,7 +4984,7 @@ public class JTree extends JComponent im
              public AccessibleText getAccessibleText() {
                  AccessibleContext ac = getCurrentAccessibleContext();
                  if (ac != null) {
@@ -18,7 +18,7 @@
                  } else {
                      return null;
                  }
-@@ -4992,7 +4992,7 @@ public class JTree extends JComponent im
+@@ -4999,7 +4999,7 @@ public class JTree extends JComponent im
              public AccessibleValue getAccessibleValue() {
                  AccessibleContext ac = getCurrentAccessibleContext();
                  if (ac != null) {
@@ -29,7 +29,7 @@
                  }
 --- a/jdk/src/share/classes/javax/swing/table/JTableHeader.java
 +++ b/jdk/src/share/classes/javax/swing/table/JTableHeader.java
-@@ -1083,7 +1083,12 @@ public class JTableHeader extends JCompo
+@@ -1088,7 +1088,12 @@ public class JTableHeader extends JCompo
              }
  
              public AccessibleAction getAccessibleAction() {
@@ -43,7 +43,7 @@
              }
  
             /**
-@@ -1099,15 +1104,30 @@ public class JTableHeader extends JCompo
+@@ -1104,15 +1109,30 @@ public class JTableHeader extends JCompo
              }
  
              public AccessibleSelection getAccessibleSelection() {
@@ -79,7 +79,7 @@
  
 --- a/jdk/src/share/classes/javax/swing/JTable.java
 +++ b/jdk/src/share/classes/javax/swing/JTable.java
-@@ -8218,7 +8218,12 @@ public class JTable extends JComponent i
+@@ -8224,7 +8224,12 @@ public class JTable extends JComponent i
               * @return the <code>AccessibleAction</code>, or <code>null</code>
               */
              public AccessibleAction getAccessibleAction() {
@@ -93,7 +93,7 @@
              }
  
              /**
-@@ -8240,7 +8245,12 @@ public class JTable extends JComponent i
+@@ -8246,7 +8251,12 @@ public class JTable extends JComponent i
               *    <code>null</code>
               */
              public AccessibleSelection getAccessibleSelection() {
@@ -107,7 +107,7 @@
              }
  
              /**
-@@ -8250,7 +8260,12 @@ public class JTable extends JComponent i
+@@ -8256,7 +8266,12 @@ public class JTable extends JComponent i
               * @return the <code>AccessibleText</code>, or <code>null</code>
               */
              public AccessibleText getAccessibleText() {
@@ -121,7 +121,7 @@
              }
  
              /**
-@@ -8260,7 +8275,12 @@ public class JTable extends JComponent i
+@@ -8266,7 +8281,12 @@ public class JTable extends JComponent i
               * @return the <code>AccessibleValue</code>, or <code>null</code>
               */
              public AccessibleValue getAccessibleValue() {
@@ -135,7 +135,7 @@
              }
  
  
-@@ -9019,7 +9039,12 @@ public class JTable extends JComponent i
+@@ -9025,7 +9045,12 @@ public class JTable extends JComponent i
               * @return the <code>AccessibleAction</code>, or <code>null</code>
               */
              public AccessibleAction getAccessibleAction() {
@@ -149,7 +149,7 @@
              }
  
              /**
-@@ -9041,7 +9066,12 @@ public class JTable extends JComponent i
+@@ -9047,7 +9072,12 @@ public class JTable extends JComponent i
               *    <code>null</code>
               */
              public AccessibleSelection getAccessibleSelection() {
@@ -163,7 +163,7 @@
              }
  
              /**
-@@ -9051,7 +9081,12 @@ public class JTable extends JComponent i
+@@ -9057,7 +9087,12 @@ public class JTable extends JComponent i
               * @return the <code>AccessibleText</code>, or <code>null</code>
               */
              public AccessibleText getAccessibleText() {
@@ -177,7 +177,7 @@
              }
  
              /**
-@@ -9061,7 +9096,12 @@ public class JTable extends JComponent i
+@@ -9067,7 +9102,12 @@ public class JTable extends JComponent i
               * @return the <code>AccessibleValue</code>, or <code>null</code>
               */
              public AccessibleValue getAccessibleValue() {

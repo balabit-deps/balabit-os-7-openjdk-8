@@ -129,7 +129,7 @@ ifneq (,$(filter $(DEB_HOST_ARCH), armel))
   with_check = disabled running check on $(DEB_HOST_ARCH)
 endif
 
-with_docs = $(if $(findstring nodocs, $(DEB_BUILD_OPTIONS)),,yes)
+with_docs = $(if $(findstring nodoc, $(DEB_BUILD_OPTIONS)),,yes)
 ifneq (,$(findstring shark, $(PKGSOURCE)))
   with_docs = disabled for shark
 endif
@@ -336,10 +336,8 @@ COMMON_PATCHES = \
 	jexec.diff \
 	default-jvm-cfg-default.diff \
 	disable-doclint-by-default.diff \
-	include-all-srcs.diff \
 	pass-extra-flags.diff \
 	hotspot-disable-werror.diff \
-	dont-strip-images.diff \
 	workaround_expand_exec_shield_cs_limit.diff \
 	zero-architectures.diff \
 	adlc-parser.patch \
@@ -351,7 +349,6 @@ COMMON_PATCHES = \
 	jdk-target-arch-define.diff \
 	m68k-support.diff \
 	javadoc-sort-enum-and-annotation-types.diff \
-	8141491.diff \
 	s390x-thread-stack-size.diff \
 	jdk-getAccessibleValue.diff \
 	compiler-flags.diff \
@@ -359,13 +356,11 @@ COMMON_PATCHES = \
 	jdk-841269-filechooser.patch \
 	jdk-i18n-pt_BR.diff \
 	jdk-java-nio-bits-unligned-aarch64.diff \
-	jdk-S8165852-overlayfs.patch \
-	hotspot-S8185723-zero-ppc32-atomic_copy64-fix.patch \
-	hotspot-S8201509-zero-s390x-atomic_copy64-fix.patch \
 	hotspot-ia64.diff \
-	jdk-8132985-backport-double-free.patch \
-	jdk-8139803-backport-warning.patch \
-	jdk-8u192-S8202261.patch \
+
+# FIXME:
+#	dont-strip-images.diff \
+#	8141491.diff \
 
 ifeq ($(derivative),Debian)
   COMMON_PATCHES += \
@@ -392,10 +387,9 @@ COMMON_PATCHES += \
 
 ifeq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs) $(hotspot_aarch32_archs)))
   COMMON_PATCHES += \
-	ppc64le-8036767.diff \
-	hotspot-powerpcspe.diff \
 	zero-sh.diff
 # FIXME	zero-opt.diff
+# FIXME ppc64le-8036767.diff
 endif
 
 # FIXME: needs an update
@@ -420,6 +414,9 @@ endif
 ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_aarch32_archs)))
   COMMON_PATCHES += \
 	aarch32.diff
+else
+  COMMON_PATCHES += \
+	enable-sa-on-aarch64.diff
 endif
 
 ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
@@ -427,19 +424,6 @@ ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
 	kfreebsd-support-jdk.diff \
 	kfreebsd-support-hotspot.diff
 endif
-
-# 8u201 security patches
-COMMON_PATCHES += \
-	sec-webrev-8u201-S8199156-jdk.patch \
-	sec-webrev-8u201-S8200659-jdk.patch \
-	sec-webrev-8u201-S8203955-jdk.patch \
-	sec-webrev-8u201-S8204895-jdk.patch \
-	sec-webrev-8u201-S8205709-jdk.patch \
-	sec-webrev-8u201-S8205714-hotspot.patch \
-	sec-webrev-8u201-S8206290-jdk.patch \
-	sec-webrev-8u201-S8208585-jdk.patch \
-	sec-webrev-8u201-S8209094-jdk.patch \
-	sec-webrev-8u201-S8210094-hotspot.patch
 
 DEFAULT_PATCHES = \
 	$(COMMON_PATCHES) \
@@ -678,11 +662,11 @@ bd_openjdk = \
 	libxtst-dev, libxi-dev, libxt-dev, libxaw7-dev, libxrender-dev, libcups2-dev, \
 	libasound2-dev, liblcms2-dev, libfreetype6-dev (>= 2.2.1), \
 	libxinerama-dev, libkrb5-dev, xsltproc, libpcsclite-dev,
-ifneq (,$(filter $(distrel),wheezy xenial artful))
+#ifneq (,$(filter $(distrel),wheezy xenial artful))
   bd_openjdk += libgtk2.0-dev,
-else
-  bd_openjdk += libgtk-3-dev,
-endif
+#else
+#  bd_openjdk += libgtk-3-dev,
+#endif
 
 pkg_ffidev = libffi-dev
 
@@ -757,11 +741,11 @@ endif
 dlopen_hl_recommends =
 dlopen_jre_depends = \
 	libglib2.0-0 (>= 2.24), libxrandr2, libxinerama1, libgl1-mesa-glx | libgl1,
-ifneq (,$(filter $(distrel),wheezy xenial artful))
+#ifneq (,$(filter $(distrel),wheezy xenial artful))
   dlopen_jre_depends += libgtk2.0-0 (>= 2.14),
-else
-  dlopen_jre_depends += libgtk-3-0,
-endif
+#else
+#  dlopen_jre_depends += libgtk-3-0,
+#endif
 
 dlopen_jre_recommends =
 
@@ -923,8 +907,10 @@ debian/control: debian/control.in debian/rules
 	fi
 
 debian/tests/%.sh: debian/tests/%.in debian/rules
-	sed -e 's/@jtreg_archs@/$(jtreg_archs)/g' \
-	  $< > $@;
+	sed \
+		-e 's,@JDK_TO_TEST@,/$(basedir),g' \
+		-e 's/@jtreg_archs@/$(jtreg_archs)/g' \
+		$< > $@;
 	chmod +x $@
 
 gen-autopkgtests: debian/tests/jtreg-autopkgtest.sh
@@ -1248,19 +1234,19 @@ TESTS_TO_RUN = $(addprefix check-,$(TEST_SUITES))
 
 check-hotspot: stamps/build
 	mkdir -p jtreg-test-output/hotspot
-	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_DIR=$(builddir)/$(sdkimg) \
+	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_TO_TEST=$(builddir)/$(sdkimg) \
 	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/hotspot/ \
 	  $(TIME) debian/tests/hotspot | tee jtreg-test-output/$@.log
 
 check-langtools: stamps/build
 	mkdir -p jtreg-test-output/langtools
-	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_DIR=$(builddir)/$(sdkimg) \
+	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_TO_TEST=$(builddir)/$(sdkimg) \
 	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/langtools/ \
 	  $(TIME) debian/tests/langtools | tee jtreg-test-output/$@.log
 
 check-jdk: stamps/build
 	mkdir -p jtreg-test-output/jdk
-	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_DIR=$(builddir)/$(sdkimg) \
+	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_TO_TEST=$(builddir)/$(sdkimg) \
 	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/jdk/ \
 	  $(TIME) debian/tests/jdk | tee jtreg-test-output/$@.log
 
@@ -1276,7 +1262,7 @@ clean: debian-clean
 	dh_testdir
 	dh_testroot
 	rm -rf $(srcdir)
-	rm -rf stamps build build-* test
+	rm -rf stamps build build-* test jtreg-test-output
 	rm -rf icedtea-sound
 	rm -rf autom4te.cache
 	rm -rf bin
@@ -1846,7 +1832,7 @@ endif
 	  install -D -m644 $$FILE debian/$$PKG/usr/share/lintian/overrides/$$PKG; \
 	done
 
-nodocs = $(if $(findstring nodocs, $(DEB_BUILD_OPTIONS)),-N$(p_doc))
+nodocs = $(if $(findstring nodoc, $(DEB_BUILD_OPTIONS)),-N$(p_doc))
 nojrez = $(if $(filter shark zero, $(alternate_vms)),,-N$(p_jrez))
 
 # Build architecture independant packages
@@ -1973,20 +1959,20 @@ endif
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u192-b26
+hg_tag			= jdk8u212-b03
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u-shenandoah
-hg_tag_aarch64		= aarch64-shenandoah-jdk8u191-b13
+hg_tag_aarch64		= aarch64-shenandoah-jdk8u212-b04
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
-hg_tag_aarch32		= jdk8u192-b12-aarch32-181022
+hg_tag_aarch32		= jdk8u202-b08-aarch32-190124
 hg_url_aarch32		= http://hg.openjdk.java.net/aarch32-port/$(hg_project_aarch32)
 origdir			= ../openjdk-8-$(package_version).orig
-source_date		:= $(shell dpkg-parsechangelog --show-field=Date)
+source_date		:= $(shell dpkg-parsechangelog | sed -n '/^Date: /{s///p;q;}')
 fetch-orig:
 	mkdir -p $(origdir)
 	wget -O $(origdir)/root.tar.bz2 $(hg_url)/archive/$(hg_tag).tar.bz2

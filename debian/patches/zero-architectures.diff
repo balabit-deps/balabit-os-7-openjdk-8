@@ -83,7 +83,7 @@
      s390)
        VAR_CPU=s390
        VAR_CPU_ARCH=s390
-@@ -371,6 +431,12 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
+@@ -373,6 +433,12 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
  
    # ZERO_ARCHDEF is used to enable architecture-specific code
    case "${OPENJDK_TARGET_CPU}" in
@@ -96,14 +96,14 @@
      ppc)     ZERO_ARCHDEF=PPC32 ;;
      ppc64)   ZERO_ARCHDEF=PPC64 ;;
      s390*)   ZERO_ARCHDEF=S390  ;;
---- a/common/autoconf/toolchain.m4
-+++ b/common/autoconf/toolchain.m4
-@@ -1354,6 +1354,8 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
+--- a/common/autoconf/flags.m4
++++ b/common/autoconf/flags.m4
+@@ -806,6 +806,8 @@ AC_DEFUN_ONCE([FLAGS_SETUP_COMPILER_FLAG
      *)
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}${OPENJDK_TARGET_CPU_BITS}"
    esac
 +  # use the default for the package builds
 +  ZERO_ARCHFLAG=""
-   TOOLCHAIN_COMPILER_CHECK_ARGUMENTS([$ZERO_ARCHFLAG], [], [ZERO_ARCHFLAG=""])
+   FLAGS_COMPILER_CHECK_ARGUMENTS([$ZERO_ARCHFLAG], [], [ZERO_ARCHFLAG=""])
    AC_SUBST(ZERO_ARCHFLAG)
  

@@ -2,7 +2,7 @@
 
 --- a/common/autoconf/libraries.m4
 +++ b/common/autoconf/libraries.m4
-@@ -666,6 +666,46 @@ AC_DEFUN_ONCE([LIB_SETUP_MISC_LIBS],
+@@ -845,6 +845,46 @@ AC_DEFUN_ONCE([LIB_SETUP_MISC_LIBS],
  
    ###############################################################################
    #
@@ -51,7 +51,7 @@
  
 --- a/jdk/make/lib/Awt2dLibraries.gmk
 +++ b/jdk/make/lib/Awt2dLibraries.gmk
-@@ -667,8 +667,8 @@ endif
+@@ -659,8 +659,8 @@ endif
  ##########################################################################################
  
  # TODO: Update awt lib path when awt is converted
@@ -62,7 +62,7 @@
      OUTPUT_DIR := $(INSTALL_LIBRARIES_HERE), \
      SRC := $(JDK_TOPDIR)/src/share/native/sun/java2d/cmm/lcms, \
      LANG := C, \
-@@ -687,19 +687,19 @@ $(eval $(call SetupNativeCompilation,BUI
+@@ -679,19 +679,19 @@ $(eval $(call SetupNativeCompilation,BUI
      LDFLAGS_windows := $(WIN_AWT_LIB) $(WIN_JAVA_LIB), \
      LDFLAGS_SUFFIX_solaris := -lawt -ljava -ljvm -lc, \
      LDFLAGS_SUFFIX_macosx := $(LIBM) -lawt -ljava -ljvm, \

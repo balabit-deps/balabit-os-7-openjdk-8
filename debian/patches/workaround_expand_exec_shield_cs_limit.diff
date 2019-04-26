@@ -7,11 +7,11 @@
 -#if defined(IA32)
 +#if defined(IA32) && !defined(ZERO)
    size_t page_size = os::vm_page_size();
+ 
    /*
-    * Take the highest VA the OS will give us and exec
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -5021,7 +5021,7 @@ ZERO_ONLY (
+@@ -5137,7 +5137,7 @@ ZERO_ONLY (
  
    Linux::capture_initial_stack(JavaThread::stack_size_at_create());
  
