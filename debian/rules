@@ -68,6 +68,8 @@ else
   is_default = yes
 endif
 
+is_upstream_release = yes
+
 srcdir		= src
 builddir	= build
 zbuilddir	= build-zero
@@ -128,6 +130,7 @@ with_check = $(if $(findstring nocheck, $(DEB_BUILD_OPTIONS)),,yes)
 ifneq (,$(filter $(DEB_HOST_ARCH), armel))
   with_check = disabled running check on $(DEB_HOST_ARCH)
 endif
+#with_check = disabled for this build
 
 with_docs = $(if $(findstring nodoc, $(DEB_BUILD_OPTIONS)),,yes)
 ifneq (,$(findstring shark, $(PKGSOURCE)))
@@ -311,9 +314,6 @@ ifneq (,$(filter $(DEB_HOST_ARCH), sparc64))
   export USE_PRECOMPILED_HEADER
 endif
 
-#	$(if $(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs)),8132051-zero.diff) \
-# FIXME: 8132051-zero.diff doesn't apply for the default hotspot tarball,
-# resulting in broken zero builds
 COMMON_PATCHES = \
 	autoconf-select.diff \
 	hotspot-warn-no-errformat.diff \
@@ -352,7 +352,6 @@ COMMON_PATCHES = \
 	s390x-thread-stack-size.diff \
 	jdk-getAccessibleValue.diff \
 	compiler-flags.diff \
-	jdk-ppc64el-S8170153.patch \
 	jdk-841269-filechooser.patch \
 	jdk-i18n-pt_BR.diff \
 	jdk-java-nio-bits-unligned-aarch64.diff \
@@ -388,8 +387,6 @@ COMMON_PATCHES += \
 ifeq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs) $(hotspot_aarch32_archs)))
   COMMON_PATCHES += \
 	zero-sh.diff
-# FIXME	zero-opt.diff
-# FIXME ppc64le-8036767.diff
 endif
 
 # FIXME: needs an update
@@ -423,6 +420,12 @@ ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
   COMMON_PATCHES += \
 	kfreebsd-support-jdk.diff \
 	kfreebsd-support-hotspot.diff
+endif
+
+# apply hotspot patch from b09
+ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_aarch32_archs)))
+  COMMON_PATCHES += \
+	hotspot-aarch32-missing-8223511.diff
 endif
 
 DEFAULT_PATCHES = \
@@ -529,12 +532,34 @@ ifeq ($(with_check),yes)
 endif
 
 COMMON_CONFIGURE_ARGS += \
-	--with-milestone='fcs' \
+	--with-milestone='$(if $(filter yes, $(is_upstream_release)),fcs,ea)' \
 	--with-user-release-suffix='$(PKGVERSION)' \
 	--with-update-version=$(updatever) \
 	--with-build-number=$(buildver)
 
 #	--with-debug-level=fastdebug \
+
+ifeq ($(distribution),Debian)
+  ifeq (,$(filter $(distrel),jessie stretch buster))
+    COMMON_CONFIGURE_ARGS += \
+	--with-vendor-name='$(distribution)'
+  endif
+else ifeq ($(distribution),Ubuntu)
+  v_pkgrel := $(shell echo $(PKGVERSION) | sed 's/^.*-//')
+  ppa_build := $(shell if echo 'v_pkgrel' | egrep '^[0-9]+(ubuntu[0-9]+)?(~[0-9.]+)?$$'; then echo no; else echo yes; fi)
+  ifeq ($(ppa_build),yes)
+    COMMON_CONFIGURE_ARGS += \
+	--with-vendor-name='Private Build'
+  else
+    ifeq (,$(filter $(distrel),trusty xenial bionic))
+      COMMON_CONFIGURE_ARGS += \
+	--with-vendor-name='$(distribution)'
+    endif
+  endif
+else
+  COMMON_CONFIGURE_ARGS += \
+	--with-vendor-name='$(distribution)'
+endif
 
 COMMON_CONFIGURE_ARGS += \
 	--with-debug-level=release \
@@ -675,6 +700,10 @@ bd_zero = \
 bd_zero = \
 	$(pkg_ffidev),
 
+ifeq (,$(filter $(distrel),precise))
+  nocheck_profile = <!nocheck>
+endif
+
 ifneq (,$(shark_archs))
   bd_zero = $(pkg_ffidev),
   ifneq (,$(filter $(distrel),lucid))
@@ -722,7 +751,7 @@ dlopen_hl_depends = \
 	libcups2, liblcms2-2,
 ifneq (,$(filter $(distrel),squeeze lucid))
   dlopen_hl_depends += libjpeg62,
-else ifneq (,$(filter $(distrel), jessie stretch sid))
+else ifneq (,$(filter $(distrel), jessie stretch buster bullseye sid))
   dlopen_hl_depends += libjpeg62-turbo,
 else
   dlopen_hl_depends += libjpeg8,
@@ -857,7 +886,7 @@ endif
 control_vars += '-Vjrehl:Breaks=$(jrehl_breaks)'
 jrehl_breaks =
 # break on ca-certificates-java except for trusty (LP: #1706567)
-ifeq (,$(filter $(distrel), trusty))
+ifeq (,$(filter $(distrel), precise trusty))
   jrehl_breaks += ca-certificates-java (<< 20160321~),
 endif
 # break on tzdata-java for stretch, see #857992
@@ -892,6 +921,7 @@ debian/control: debian/control.in debian/rules
 	      -e 's/@any_archs@/$(any_archs)/g' \
 	      -e 's/@hotspot_archs@/$(hotspot_archs)/g' \
 	      -e 's/@altzero_archs@/$(altzero_archs)/g' \
+	      -e 's/@nocheck@/$(nocheck_profile)/g' \
 	    debian/control.in \
 	    $(if $(transitional_jamvm_pkg), debian/control.jamvm-trans) \
 	    $(if $(altzero_archs), debian/control.zero-jre) \
@@ -908,12 +938,13 @@ debian/control: debian/control.in debian/rules
 
 debian/tests/%.sh: debian/tests/%.in debian/rules
 	sed \
-		-e 's,@JDK_TO_TEST@,/$(basedir),g' \
+		-e 's,@JDK_DIR@,/$(basedir),g' \
 		-e 's/@jtreg_archs@/$(jtreg_archs)/g' \
+		-e 's:@doc_dir@:/usr/share/doc/$(p_jrehl)/:g' \
 		$< > $@;
 	chmod +x $@
 
-gen-autopkgtests: debian/tests/jtreg-autopkgtest.sh
+gen-autopkgtests: debian/tests/jtdiff-autopkgtest.sh debian/tests/jtreg-autopkgtest.sh
 
 packaging-files:
 	for f in debian/*.in debian/patches/*.in; do \
@@ -1216,13 +1247,10 @@ ifneq (,$(filter $(VMNAME), $(with_jtreg_check)))
 	@echo "END jtreg-summary-$(VMNAME)"
 
 	-for i in hotspot langtools jdk; do \
-	  test -f jtreg-test-output/check-$$i-$(VMNAME).log || continue; \
-	  for t in $$(egrep '^(FAILED|Error)' jtreg-test-output/check-$$i-$(VMNAME).log | sed 's/.* \(.*\)\.[^.][^.]*$$/\1/'); do \
-	    echo jtreg-test-output/$$i/JTwork/$$t.jtr; \
-	  done; \
+	  find jtreg-test-output/$$i/JTwork/ -name '*.jtr'; \
 	done > jtreg-test-output/failed_tests-$(VMNAME).list
-	GZIP=-9vn tar -C . -c -z -f jtreg-test-output/failed_tests-$(VMNAME).tar.gz -T jtreg-test-output/failed_tests-$(VMNAME).list
-	GZIP=-9vn tar -C . -c -z -f jtreg-test-output/jtreport-$(VMNAME).tar.gz jtreg-test-output/*/JTreport/
+	GZIP=-9vn tar --ignore-failed-read -C . -c -z -f jtreg-test-output/failed_tests-$(VMNAME).tar.gz -T jtreg-test-output/failed_tests-$(VMNAME).list
+	GZIP=-9vn tar -C . -c -z -f jtreg-test-output/jtreport-$(VMNAME).tar.gz $$(find jtreg-test-output -name JTreport)
 else
 	echo "jtreg harness not run for this build" > jtreg-test-output/jtreg_output-$(VMNAME)
 endif
@@ -1235,19 +1263,19 @@ TESTS_TO_RUN = $(addprefix check-,$(TEST_SUITES))
 check-hotspot: stamps/build
 	mkdir -p jtreg-test-output/hotspot
 	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_TO_TEST=$(builddir)/$(sdkimg) \
-	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/hotspot/ \
+	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/ \
 	  $(TIME) debian/tests/hotspot | tee jtreg-test-output/$@.log
 
 check-langtools: stamps/build
 	mkdir -p jtreg-test-output/langtools
 	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_TO_TEST=$(builddir)/$(sdkimg) \
-	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/langtools/ \
+	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/ \
 	  $(TIME) debian/tests/langtools | tee jtreg-test-output/$@.log
 
 check-jdk: stamps/build
 	mkdir -p jtreg-test-output/jdk
 	JTREG_OPTIONS=$(JTREG_OPTIONS) VMNAME=$(VMNAME) JDK_TO_TEST=$(builddir)/$(sdkimg) \
-	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/jdk/ \
+	AUTOPKGTEST_TMP=/tmp/ AUTOPKGTEST_ARTIFACTS=jtreg-test-output/ \
 	  $(TIME) debian/tests/jdk | tee jtreg-test-output/$@.log
 
 jtregcheck: $(TESTS_TO_RUN)
@@ -1941,35 +1969,35 @@ ifeq (,$(findstring nostrip, $(DEB_BUILD_OPTIONS)))
 	done
 endif
 
-	dh_compress -s $(nodemo) $(nojrez) -Xexamples -Xdemo -Xpackage-list
-	dh_fixperms -s $(nodemo) $(nojrez)
+	dh_compress -a $(nodemo) $(nojrez) -Xexamples -Xdemo -Xpackage-list
+	dh_fixperms -a $(nodemo) $(nojrez)
 	dh_makeshlibs -p$(p_jrehl) -p$(p_jre)
-	dh_shlibdeps -s $(nodemo) $(nojrez) -L $(p_jrehl) \
+	dh_shlibdeps -a $(nodemo) $(nojrez) -L $(p_jrehl) \
 		-l$(shlibdeps_ld_path) \
 		--
-	dh_installdeb -s $(nodemo) $(nojrez)
-	dh_gencontrol -s $(nodemo) $(nojrez) \
+	dh_installdeb -a $(nodemo) $(nojrez)
+	dh_gencontrol -a $(nodemo) $(nojrez) \
 		-- $(control_vars)
-	dh_md5sums -s $(nodemo) $(nojrez)
+	dh_md5sums -a $(nodemo) $(nojrez)
 	: # FIXME: something seems to hang here ...
 	-ps afx
 	NO_PKG_MANGLE=1 \
-	dh_builddeb -s $(nodemo) $(nojrez) #$(bd_options)
+	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u212-b03
+hg_tag			= jdk8u222-b10
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u-shenandoah
-hg_tag_aarch64		= aarch64-shenandoah-jdk8u212-b04
+hg_tag_aarch64		= aarch64-shenandoah-jdk8u222-b10
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
-hg_tag_aarch32		= jdk8u202-b08-aarch32-190124
+hg_tag_aarch32		= jdk8u222-b08-aarch32-190710
 hg_url_aarch32		= http://hg.openjdk.java.net/aarch32-port/$(hg_project_aarch32)
 origdir			= ../openjdk-8-$(package_version).orig
 source_date		:= $(shell dpkg-parsechangelog | sed -n '/^Date: /{s///p;q;}')
@@ -1977,6 +2005,8 @@ fetch-orig:
 	mkdir -p $(origdir)
 	wget -O $(origdir)/root.tar.bz2 $(hg_url)/archive/$(hg_tag).tar.bz2
 	for repo in corba jaxp jaxws langtools hotspot jdk nashorn; do \
+	  echo wget -O $(origdir)/$$repo.tar.bz2 \
+	    $(hg_url)/$$repo/archive/$(hg_tag).tar.bz2; \
 	  wget -O $(origdir)/$$repo.tar.bz2 \
 	    $(hg_url)/$$repo/archive/$(hg_tag).tar.bz2; \
 	done

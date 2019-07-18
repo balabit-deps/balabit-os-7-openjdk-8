@@ -14,18 +14,12 @@ fi
 
 host_arch=${DEB_HOST_ARCH:-$(dpkg --print-architecture)}
 
-# don't mess around with JT_* env vars. If JDK_TO_TEST is set, then the
-# script is called from the build, if not, from the autopkg tests
-if [ -z "$JDK_TO_TEST" ]; then
-  JDK_TO_TEST=@JDK_TO_TEST@
-fi
-JVERSION=$($JDK_TO_TEST/bin/java -version 2>&1| sed -n '1s/.*"\(.*\)".*/\1/p')
-JMAJOR=$(echo $JVERSION | sed 's/\..*//')
+# force jtreg to use the JDK we depend on instead of default-java
+export JT_JAVA=$(echo /usr/lib/jvm/java-8-openjdk-amd64 | sed "s/-[^-]*$/-$host_arch/")
 
 vmname=${VMNAME:-hotspot}
 
-jt_report_tb="/usr/share/doc/openjdk-$JMAJOR-jdk/test-${host_arch}/jtreport-${vmname}.tar.gz"
-build_report_dir="${AUTOPKGTEST_TMP}/jtreg-test-output/${testsuite}/JTreport"
+jt_report_tb="/usr/share/doc/openjdk-8-jre-headless//test-${host_arch}/jtreport-${vmname}.tar.gz"
 
 if [ ! -f "${jt_report_tb}" ]; then
   echo "Unable to compare jtreg results: no build jtreport found for ${vmname}/${host_arch}."
@@ -33,9 +27,29 @@ if [ ! -f "${jt_report_tb}" ]; then
   exit 77
 fi
 
-# extract testsuite results from original openjdk build
-[ -d "${build_report_dir}" ] || \
-  tar -xf "${jt_report_tb}" -C "${AUTOPKGTEST_TMP}"
+# create directories to hold the results
+mkdir -p "${AUTOPKGTEST_ARTIFACTS}/${testsuite}"
+mkdir -p "${AUTOPKGTEST_TMP}/openjdk-pkg-jtreg-report"
 
-jtdiff -o "${AUTOPKGTEST_ARTIFACTS}/jtdiff.html" "${build_report_dir}" "${AUTOPKGTEST_ARTIFACTS}/JTreport" || true
-jtdiff "${build_report_dir}" "${AUTOPKGTEST_ARTIFACTS}/JTreport" | tee "${AUTOPKGTEST_ARTIFACTS}/jtdiff.txt"
+current_report_dir="${AUTOPKGTEST_ARTIFACTS}/${testsuite}"
+previous_report_dir="${AUTOPKGTEST_TMP}/openjdk-pkg-jtreg-report/${testsuite}"
+
+# extract testsuite results from openjdk package
+[ -d "${previous_report_dir}" ] || \
+  tar -xf "${jt_report_tb}" --strip-components=1 -C "${AUTOPKGTEST_TMP}/openjdk-pkg-jtreg-report"
+
+
+jtdiff -o "${current_report_dir}/jtdiff.html" "${previous_report_dir}/JTreport" "${current_report_dir}/JTreport" || true
+jtdiff "${previous_report_dir}/JTreport" "${current_report_dir}/JTreport" | tee "${current_report_dir}/jtdiff.txt" || true
+
+# create jdiff super-diff structure
+jtdiff_dir="${AUTOPKGTEST_TMP}/jtdiff-${testsuite}/${host_arch}"
+mkdir -p "${jtdiff_dir}/"{1,2} "${current_report_dir}/jtdiff-super"
+ln -sf "${previous_report_dir}/"[0-9] "${jtdiff_dir}/1/"
+ln -sf "${current_report_dir}/"[0-9] "${jtdiff_dir}/2/"
+
+# run jtdiff super-diff
+jtdiff -o "${current_report_dir}/jtdiff-super/" -s "${AUTOPKGTEST_TMP}/jtdiff-${testsuite}/" || true
+
+# fail if we detect a regression
+egrep '^pass +[^-]{3}' "${current_report_dir}/jtdiff.txt" && exit 1

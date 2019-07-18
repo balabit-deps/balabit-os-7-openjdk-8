@@ -6,5 +6,5 @@ set -o nounset
 
 [ -d langtools/test ] || tar xf langtools.tar.xz langtools/test/
 
-debian/tests/jtreg-autopkgtest.sh -dir:langtools/test com tools lib
+debian/tests/jtreg-autopkgtest.sh langtools -dir:langtools/test com tools lib || true
 debian/tests/jtdiff-autopkgtest.sh langtools

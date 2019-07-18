@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 set -o errexit
 set -o errtrace
 set -o pipefail
@@ -6,5 +6,5 @@ set -o nounset
 
 [ -d hotspot/test ] || tar xf hotspot.tar.xz hotspot/test/
 
-debian/tests/jtreg-autopkgtest.sh -dir:hotspot/test compiler gc runtime sanity serviceability
+debian/tests/jtreg-autopkgtest.sh hotspot -dir:hotspot/test compiler gc runtime sanity serviceability || true
 debian/tests/jtdiff-autopkgtest.sh hotspot

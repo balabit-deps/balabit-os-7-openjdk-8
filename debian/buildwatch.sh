@@ -26,6 +26,17 @@ is_running() {
     return $?
 }
 
+cleanup() {
+    # find any hs_err_pid files generated during the build and print them out
+    # this helps debugging what went wrong during builds
+    find . -type f -name 'hs_err_pid*.log' \
+      -printf "[$0] === HOTSPOT ERROR LOG ===\n[$0] %p (last modification at %t)\n" \
+      -exec cat {} \;
+}
+
+for sig in INT QUIT HUP TERM; do trap "cleanup; trap - $sig EXIT; kill -s $sig "'"$$"' "$sig"; done
+trap cleanup EXIT
+
 while ! time_up; do
     if [ ! -f buildwatch.pid ]; then
         echo "[$0] pidfile removed" && break

@@ -4,17 +4,20 @@ set -o errtrace
 set -o pipefail
 set -o nounset
 
+testsuite=$1
+shift
+
 if [ -z "${AUTOPKGTEST_TMP+x}" ] || [ -z "${AUTOPKGTEST_ARTIFACTS+x}" ]; then
   echo "Environment variables AUTOPKGTEST_TMP and AUTOPKGTEST_ARTIFACTS must be set" >&2
   exit 1
 fi
 
-host_arch=${DEB_HOST_ARCH:-$(dpkg --print-architecture)}
+host_arch="${DEB_HOST_ARCH:-$(dpkg --print-architecture)}"
 
-# don't mess around with JT_* env vars. If JDK_TO_TEST is set, then the
-# script is called from the build, if not, from the autopkg tests
-if [ -z "$JDK_TO_TEST" ]; then
-  JDK_TO_TEST=$(echo /usr/lib/jvm/java-8-openjdk-amd64 | sed "s/-[^-]*$/-$host_arch/")
+# force jtreg to use the JDK we depend on instead of default-java
+export JT_JAVA=$(echo /usr/lib/jvm/java-8-openjdk-amd64 | sed "s/-[^-]*$/-$host_arch/")
+if [ -z "${JDK_TO_TEST+x}" ]; then
+  JDK_TO_TEST=$JT_JAVA
 fi
 
 jtreg_version="$(dpkg-query -W jtreg | cut -f2)"
@@ -29,13 +32,13 @@ if dpkg --compare-versions ${jtreg_version} ge 4.2; then
 fi
   
 # check java binary
-if [ ! -x "${JDK_TO_TEST}/bin/java" ]; then 
+if [ ! -x "${JDK_TO_TEST}/bin/java" ]; then
   echo "Error: '${JDK_TO_TEST}/bin/java' is not an executable." >&2
   exit 1
 fi
 
 # restrict the tests to a few archs (set from debian/rules)
-if ! echo "${host_arch}" | grep -E "^($(echo amd64 i386 arm64 ppc64 ppc64el sparc64 armhf kfreebsd-amd64 kfreebsd-i386 alpha arm64 armel armhf ia64 mips mipsel mips64 mips64el powerpc powerpcspe ppc64 ppc64el s390x sh4 x32 | tr ' ' '|'))$"; then
+if ! echo "${host_arch}" | grep -qE "^($(echo amd64 i386 arm64 ppc64 ppc64el sparc64 armhf kfreebsd-amd64 kfreebsd-i386 alpha arm64 armel armhf ia64 mips mipsel mips64 mips64el powerpc powerpcspe ppc64 ppc64el s390x sh4 x32 | tr ' ' '|'))$"; then
   echo "Error: ${host_arch} is not on the jtreg_archs list, ignoring it."
   exit 77
 fi
@@ -78,14 +81,43 @@ cleanup() {
 
 trap "cleanup" EXIT INT TERM ERR
 
-jtreg ${jt_options} \
-  -verbose:summary \
-  -automatic \
-  -retain:none \
-  -ignore:quiet \
-  -agentvm \
-  -timeout:5 \
-  -workDir:"${AUTOPKGTEST_ARTIFACTS}/JTwork" \
-  -reportDir:"${AUTOPKGTEST_ARTIFACTS}/JTreport" \
-  -jdk:${JDK_TO_TEST} \
-  $@ 
+jtwork_dir="${AUTOPKGTEST_TMP}/${testsuite}/JTwork"
+output_dir="${AUTOPKGTEST_ARTIFACTS}/${testsuite}/"
+
+# retry tests with "fail" or "error" status at most 3 times
+for i in 0 1 2 3; do
+  # save each try under its own folder to preserve history
+  report_path="${i}/JTreport"
+  report_dir="${output_dir}/${report_path}"
+  jtreg ${jt_options} \
+    -verbose:summary \
+    -automatic \
+    -retain:none \
+    -ignore:quiet \
+    -agentvm \
+    -timeout:5 \
+    -workDir:"${jtwork_dir}" \
+    -reportDir:"${report_dir}" \
+    -jdk:${JDK_TO_TEST} \
+    ${on_retry:-} $@ \
+      && exit_code=0 && break || exit_code=$?
+
+  # break if jtdiff reports no difference from previous run
+  # also deletes the just created JTreport
+  # DISABLED: don't use it for now as flaky tests could still pass given more retries
+  #jtdiff "${output_dir}/JTreport" "$report_dir" >/dev/null 2>&1 \
+  #  && rm -rf "${report_dir}" && break
+
+  # link latest JTreport to output_dir
+  ln -sf -t "${output_dir}" "$report_path"
+  on_retry="-status:fail,error"
+done
+
+# copy .jtr files from failed tests for latter debugging
+find "${jtwork_dir}" -name '*.jtr' -exec egrep -q '^execStatus=[^Pass]' {} \; -printf "%P\n" \
+  | while IF= read -r jtr; do
+      mkdir -p "$(dirname "${output_dir}/JTwork/${jtr}")"
+      cp "${jtwork_dir}/${jtr}" "${output_dir}/JTwork/$jtr"
+  done
+
+exit $exit_code

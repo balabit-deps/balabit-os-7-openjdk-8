@@ -1,11 +1,136 @@
-openjdk-8 (8u212-b03-0ubuntu1.18.04.1) bionic-security; urgency=medium
+openjdk-8 (8u222-b10-1ubuntu1~18.04.1) bionic-security; urgency=medium
 
   * Backport from Eoan.
-  * debian/control: regenerated.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Fri, 26 Apr 2019 01:04:36 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 18 Jul 2019 18:52:48 +0000
 
-openjdk-8 (8u212-b03-0ubuntu1) eoan; urgency=medium
+openjdk-8 (8u222-b10-1ubuntu2) eoan; urgency=medium
+
+  * Improve and fix build tests and autopkgtests:
+    - Update debian/tests/hotspot,jdk,langtools to ignore
+      jtreg-autopkgtest.sh return code.
+    - Create debian/tests/jtdiff-autopkgtest.in as it depends
+      on debian/rules variables.
+    - debian/tests/jtreg-autopkgtest.sh:
+      + Enable retry of failed tests to trim out flaky tests.
+      + Fix unbound variable.
+      + Force JT_JAVA otherwise jtreg will look for
+        /usr/lib/jvm/default-java which might not be installed
+        or be the right JVM to use.
+      + Keep .jtr files from failed tests only.
+    - debian/tests/jtdiff-autopkgtest.sh:
+      + Fail only if an actual regression is detected.
+      + Force JT_JAVA otherwise jtreg will look for
+        /usr/lib/jvm/default-java which might not be installed
+        or be the right JVM to use.
+      + Add the super-diff comparison from jtdiff.
+    - debian/rules:
+      + Preserve all JTreport directories in the test output
+        directory.
+      + Use JDK_DIR instead of JDK_TO_TEST for autopkgtest
+        generation.
+      + Package all .jtr files from JTwork as jtreg-autopkgtest.sh
+        makes sure it contains only failing tests.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 18 Jul 2019 18:49:56 +0000
+
+openjdk-8 (8u222-b10-1) unstable; urgency=high
+
+  * Update to 8u222-b10 (except for AArch32, updated to b08).
+    - Security fixes:
+      - S8191073: JpegImageReader throws IndexOutOfBoundsException when
+        trying to read image data from tables-only image.
+      - S8208698, CVE-2019-2745: Improved ECC Implementation.
+      - S8212328, CVE-2019-2762: Exceptional throw cases.
+      - S8213431, CVE-2019-2766: Improve file protocol handling.
+      - S8213432, CVE-2019-2769: Better copies of CopiesList.
+      - S8216381, CVE-2019-2786: More limited privilege usage.
+      - S8217563: Improve realm maintenance.
+      - S8218863: Better endpoint checks.
+      - S8218873: Improve JSSE endpoint checking.
+      - S8218876, CVE-2019-7317: Improve PNG support options.
+      - S8219018: Adjust positions of glyphs.
+      - S8219020: Table alternate substitutions.
+      - S8219775: Certificate validation improvements.
+      - S8220192: Better outlook for SecureRandom.
+      - S8220517: Enhanced GIF support.
+      - S8221518, CVE-2019-2816: Normalize normalization.
+      - S8223511, CVE-2019-2842: Extended AES support.
+
+  [ Matthias Klose ]
+  * Bump standards version.
+
+  [ Tiago Stürmer Daitx ]
+  * Backport fix for S8223511 for AArch32.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 18 Jul 2019 18:57:23 +0200
+
+openjdk-8 (8u222-b07-3) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Matthias Klose <doko@debian.org>  Sun, 07 Jul 2019 22:02:56 +0200
+
+openjdk-8 (8u222-b07-2) experimental; urgency=medium
+
+  * Remove AArch32 patches, applied upstream.
+  * Fix build dependencies for Ubuntu precise builds.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 29 Jun 2019 11:17:16 +0200
+
+openjdk-8 (8u222-b07-1) experimental; urgency=medium
+
+  * Update to 8u222-b07.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 29 Jun 2019 10:48:23 +0200
+
+openjdk-8 (8u222-b05-1) experimental; urgency=medium
+
+  [ Matthias Klose ]
+  * Update to 8u222-b05 (except for AArch32).
+  * Apply suggested hotspot fixes for AArch32.
+  * Re-enable running the testsuite.
+
+  [ Tiago Stürmer Daitx ]
+  * Find any hs_err_pid files generated during the build and send to stdout.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 10 Jun 2019 15:03:02 +0200
+
+openjdk-8 (8u222-b04-3) experimental; urgency=medium
+
+  * Update ARM32 to jdk8u222-b04-aarch32-190603.
+  * Regenerate the ppc64el patch.
+  * Remove unused patches ppc64le-8036767 and zero-opt.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 07 Jun 2019 09:14:38 +0200
+
+openjdk-8 (8u222-b04-1) experimental; urgency=medium
+
+  * Update to 8u222-b04.
+  * Update ARM32 to jdk8u212-b04-aarch32-190430.
+  * Fix 32bit zero builds. 
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 03 Jun 2019 12:11:07 +0200
+
+openjdk-8 (8u212-b03-3) UNRELEASED; urgency=medium
+
+  * Use -a instead of -s for debhelper tools.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 28 May 2019 14:10:32 +0200
+
+openjdk-8 (8u212-b03-2) unstable; urgency=medium
+
+  * Don't apply the 8221355 fix for ARM builds.
+  * Don't configure --with-vendor-name on stable releases.
+  * Fix the jpeg runtime dependency for the build in unstable.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 28 May 2019 10:14:27 +0200
+
+openjdk-8 (8u212-b03-1) unstable; urgency=medium
+
+  [ Matthias Klose ]
+  * Configure --with-vendor-name.
+  * 8221355: Fix performance regression after JDK-8155635 backport into 8u.
 
   [ Tiago Stürmer Daitx ]
   * Update to 8u212-b03. LP: #1826001.
@@ -37,7 +162,7 @@ openjdk-8 (8u212-b03-0ubuntu1) eoan; urgency=medium
     - debian/control.in: put @bd_cross@ onto same line as @bd_nss@ as
       it can be empty.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 25 Apr 2019 21:28:59 +0000
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 29 Apr 2019 14:51:40 +0200
 
 openjdk-8 (8u212-b01-1) unstable; urgency=medium
 
@@ -87,43 +212,6 @@ openjdk-8 (8u202-b26-1) unstable; urgency=high
     - debian/tests/jtreg-autopkgtest.sh: regenerated.
 
  -- Matthias Klose <doko@ubuntu.com>  Sun, 17 Mar 2019 17:07:16 +0100
-
-openjdk-8 (8u191-b12-2ubuntu0.18.04.1) bionic-security; urgency=medium
-
-  * Backport from Disco.
-  * debian/control: regenerated.
-
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 14 Jan 2019 21:02:00 +0000
-
-openjdk-8 (8u191-b12-2ubuntu0.19.04.1) disco; urgency=medium
-
-  * Apply 11.0.2 security patches.
-  * Security fixes:
-    - CVE-2019-2422, S8206290: Better FileChannel transfer performance.
-    - CVE-2019-2426, S8209094: Improve web server connections.
-    - S8199156: Better route routing.
-    - S8199552: Update to build scripts.
-    - S8200659: Improve BigDecimal support.
-    - S8203955: Improve robot support.
-    - S8204895: Better icon support.
-    - S8205709: Proper allocation handling.
-    - S8205714: Initial class initialization.
-    - S8210094: Better loading of classloader classes.
-    - S8210606: Improved data set handling.
-    - S8210866: Improve JPEG processing.
-  * Update DEP8 tests:
-    - debian/tests/control: updated to allow stderr output and to remove
-      dpkg-dev dependency.
-    - debian/tests/jtdiff-autopkgtest.sh: use dpkg --print-architecture
-      instead of dpkg-architecture; log script name on any output.
-    - debian/tests/jtreg-autopkgtest.in: use dpkg --print-architecture instead
-      of dpkg-architecture; do not retain test temporary files; log script
-      name on any output.
-    - debian/tests/jtreg-autopkgtest.sh: regenerated.
-  * debian/patches/jdk-8u192-S8202261.patch: RandomAccessFile::setLength will
-    not shrink sparse files. (LP: #1811324)
-
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 14 Jan 2019 04:14:40 +0000
 
 openjdk-8 (8u191-b12-2) unstable; urgency=high
 
