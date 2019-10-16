@@ -47,6 +47,8 @@ endif
 multiarch_dir = /$(DEB_HOST_MULTIARCH)
 
 hotspot_aarch32_archs = armhf
+hotspot_aarch64_archs = arm64
+
 hotspot_archs	= amd64 i386 arm64 ppc64 ppc64el sparc64 \
 	$(hotspot_aarch32_archs) kfreebsd-amd64 kfreebsd-i386
 jtreg_archs	= $(hotspot_archs) alpha arm64 armel armhf \
@@ -154,7 +156,6 @@ hotspot_version = $(if $(filter $(DEB_HOST_ARCH), $(hotspot_archs)),default,zero
 hotspot_version = default
 # FIXME: 8u91 breaks zero, the jdk8-aarch64 hotspot has these issues fixed,
 # without any updates to the jdk8u project.
-hotspot_aarch64_archs = arm64 # armhf powerpc s390x
 ifneq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs)))
   hotspot_version = aarch64
 endif
@@ -420,12 +421,6 @@ ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
   COMMON_PATCHES += \
 	kfreebsd-support-jdk.diff \
 	kfreebsd-support-hotspot.diff
-endif
-
-# apply hotspot patch from b09
-ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_aarch32_archs)))
-  COMMON_PATCHES += \
-	hotspot-aarch32-missing-8223511.diff
 endif
 
 DEFAULT_PATCHES = \
@@ -945,6 +940,7 @@ debian/tests/%.sh: debian/tests/%.in debian/rules
 	chmod +x $@
 
 gen-autopkgtests: debian/tests/jtdiff-autopkgtest.sh debian/tests/jtreg-autopkgtest.sh
+	echo $(hotspot_archs) > debian/tests/hotspot-archs
 
 packaging-files:
 	for f in debian/*.in debian/patches/*.in; do \
@@ -1987,17 +1983,17 @@ endif
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u222-b10
+hg_tag			= jdk8u232-ga
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u-shenandoah
-hg_tag_aarch64		= aarch64-shenandoah-jdk8u222-b10
+hg_tag_aarch64		= aarch64-shenandoah-jdk8u232-b09
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
-hg_tag_aarch32		= jdk8u222-b08-aarch32-190710
+hg_tag_aarch32		= jdk8u232-b08-aarch32-191010
 hg_url_aarch32		= http://hg.openjdk.java.net/aarch32-port/$(hg_project_aarch32)
 origdir			= ../openjdk-8-$(package_version).orig
 source_date		:= $(shell dpkg-parsechangelog | sed -n '/^Date: /{s///p;q;}')

@@ -52,7 +52,7 @@
  
 --- a/common/autoconf/spec.gmk.in
 +++ b/common/autoconf/spec.gmk.in
-@@ -571,6 +571,7 @@ endif
+@@ -603,6 +603,7 @@ endif
  ENABLE_JFR=@ENABLE_JFR@
  ENABLE_INTREE_EC=@ENABLE_INTREE_EC@
  USE_EXTERNAL_LIBJPEG:=@USE_EXTERNAL_LIBJPEG@
@@ -84,7 +84,7 @@
    ifneq ($(OPENJDK_TARGET_OS), macosx)
      LIBSPLASHSCREEN_DIRS += $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/sun/awt/splashscreen
    else
-@@ -1221,12 +1227,12 @@ ifndef BUILD_HEADLESS_ONLY
+@@ -1222,12 +1228,12 @@ ifndef BUILD_HEADLESS_ONLY
        LANG := C, \
        OPTIMIZATION := LOW, \
        CFLAGS := $(LIBSPLASHSCREEN_CFLAGS) $(CFLAGS_JDKLIB) \

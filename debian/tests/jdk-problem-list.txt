@@ -1,0 +1,20 @@
+############################################################################
+
+# Debian - tests to be fixed
+
+############################################################################
+# Execution failed: `main' threw exception:
+# java.awt.AWTError:
+# Error trying to install Assistive Technology:
+# org.GNOME.Accessibility.AtkWrapper java.security.AccessControlException: access denied ("java.lang.RuntimePermission" "accessClassInPackage.org.GNOME.Accessibility")
+# Need to either disable AtkWrapper or add it to the security policy
+java/beans/PropertyEditor/TestFontClass.java			linux-all
+
+# Execution failed: `main' threw exception: java.lang.Exception: At least one cacert test failed
+# Need to update tests to conform to Debian/Ubuntu certificates
+sun/security/lib/cacerts/VerifyCACerts.java			linux-all
+
+# timing-out, exit 1, need to investigate why
+#sun/tools/clhsdb/Basic.sh					linux-all
+#sun/tools/hsdb/Basic.sh						linux-all
+

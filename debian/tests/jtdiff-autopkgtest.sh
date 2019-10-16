@@ -14,10 +14,13 @@ fi
 
 host_arch=${DEB_HOST_ARCH:-$(dpkg --print-architecture)}
 
-# force jtreg to use the JDK we depend on instead of default-java
-export JT_JAVA=$(echo /usr/lib/jvm/java-8-openjdk-amd64 | sed "s/-[^-]*$/-$host_arch/")
+if grep -q -w "${host_arch}" debian/tests/hotspot-archs; then
+  default_vm=hotspot
+else
+  default_vm=zero
+fi
 
-vmname=${VMNAME:-hotspot}
+vmname=${VMNAME:-${default_vm}}
 
 jt_report_tb="/usr/share/doc/openjdk-8-jre-headless//test-${host_arch}/jtreport-${vmname}.tar.gz"
 
@@ -52,4 +55,4 @@ ln -sf "${current_report_dir}/"[0-9] "${jtdiff_dir}/2/"
 jtdiff -o "${current_report_dir}/jtdiff-super/" -s "${AUTOPKGTEST_TMP}/jtdiff-${testsuite}/" || true
 
 # fail if we detect a regression
-egrep '^pass +[^-]{3}' "${current_report_dir}/jtdiff.txt" && exit 1
+if egrep '^(pass|---) +(fail|error)' "${current_report_dir}/jtdiff.txt"; then exit 1; else exit 0; fi

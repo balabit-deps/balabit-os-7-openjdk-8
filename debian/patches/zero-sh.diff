@@ -2,7 +2,7 @@
 
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -1970,7 +1970,8 @@ void * os::dll_load(const char *filename
+@@ -1971,7 +1971,8 @@ void * os::dll_load(const char *filename
      {EM_MIPS_RS3_LE, EM_MIPS_RS3_LE, ELFCLASS32, ELFDATA2LSB, (char*)"MIPSel"},
      {EM_MIPS,        EM_MIPS,    ELFCLASS32, ELFDATA2MSB, (char*)"MIPS"},
      {EM_PARISC,      EM_PARISC,  ELFCLASS32, ELFDATA2MSB, (char*)"PARISC"},
@@ -12,7 +12,7 @@
    };
  
    #if  (defined IA32)
-@@ -2001,9 +2002,11 @@ void * os::dll_load(const char *filename
+@@ -2002,9 +2003,11 @@ void * os::dll_load(const char *filename
      static  Elf32_Half running_arch_code=EM_MIPS;
    #elif  (defined M68K)
      static  Elf32_Half running_arch_code=EM_68K;

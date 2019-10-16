@@ -11,7 +11,7 @@
    /*
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -5137,7 +5137,7 @@ ZERO_ONLY (
+@@ -5143,7 +5143,7 @@ ZERO_ONLY (
  
    Linux::capture_initial_stack(JavaThread::stack_size_at_create());
  

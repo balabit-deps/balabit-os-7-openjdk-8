@@ -2,11 +2,11 @@
 
 --- a/hotspot/src/os/linux/vm/os_linux.cpp
 +++ b/hotspot/src/os/linux/vm/os_linux.cpp
-@@ -308,10 +308,10 @@ void os::init_system_properties_values()
+@@ -367,10 +367,10 @@ void os::init_system_properties_values()
  //        1: ...
  //        ...
  //        7: The default directories, normally /lib and /usr/lib.
--#if defined(AMD64) || defined(_LP64) && (defined(SPARC) || defined(PPC) || defined(S390)) || defined(BUILTIN_SIM)
+-#if defined(AMD64) || defined(_LP64) && (defined(SPARC) || defined(PPC) || defined(S390))
 -#define DEFAULT_LIBPATH "/usr/lib64:/lib64:/lib:/usr/lib"
 +#ifdef DEB_MULTIARCH
 +#define DEFAULT_LIBPATH	"/usr/lib/" DEB_MULTIARCH "/jni" ":/lib/" DEB_MULTIARCH ":/usr/lib/" DEB_MULTIARCH ":/usr/lib/jni:/lib:/usr/lib"

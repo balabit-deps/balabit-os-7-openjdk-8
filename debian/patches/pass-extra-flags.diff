@@ -1,19 +1,19 @@
 --- a/hotspot/make/linux/makefiles/jsig.make
 +++ b/hotspot/make/linux/makefiles/jsig.make
-@@ -54,7 +54,9 @@ endif
+@@ -59,7 +59,9 @@ endif
  $(LIBJSIG): $(JSIGSRCDIR)/jsig.c $(LIBJSIG_MAPFILE)
  	@echo Making signal interposition lib...
  	$(QUIETLY) $(CC) $(SYMFLAG) $(ARCHFLAG) $(SHARED_FLAG) $(PICFLAG) \
--                         $(LFLAGS_JSIG) $(JSIG_DEBUG_CFLAGS) $(EXTRA_CFLAGS) -o $@ $< -ldl
+-                         $(LFLAGS_JSIG) $(JSIG_DEBUG_CFLAGS) $(JSIG_OPT_FLAGS) $(EXTRA_CFLAGS) -o $@ $< -ldl
 +                         $(LFLAGS_JSIG) $(EXTRA_LDFLAGS) \
-+                         $(JSIG_DEBUG_CFLAGS) $(EXTRA_CFLAGS) \
++                         $(JSIG_DEBUG_CFLAGS)  $(JSIG_OPT_FLAGS) $(EXTRA_CFLAGS) \
 +                         -o $@ $< -ldl
  ifeq ($(ENABLE_FULL_DEBUG_SYMBOLS),1)
    ifneq ($(STRIP_POLICY),no_strip)
  	$(QUIETLY) $(OBJCOPY) --only-keep-debug $@ $(LIBJSIG_DEBUGINFO)
 --- a/hotspot/make/linux/makefiles/vm.make
 +++ b/hotspot/make/linux/makefiles/vm.make
-@@ -122,6 +122,7 @@ CFLAGS += $(CFLAGS/NOEX)
+@@ -123,6 +123,7 @@ CFLAGS += $(CFLAGS/NOEX)
  
  # Extra flags from gnumake's invocation or environment
  CFLAGS += $(EXTRA_CFLAGS)

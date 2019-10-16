@@ -1,6 +1,6 @@
 --- a/common/autoconf/generated-configure.sh
 +++ b/common/autoconf/generated-configure.sh
-@@ -14779,9 +14779,6 @@ $as_echo "$with_jvm_variants" >&6; }
+@@ -14612,9 +14612,6 @@ $as_echo "$with_jvm_variants" >&6; }
    if test "x$VAR_CPU" = xppc64 -o "x$VAR_CPU" = xppc64le ; then
      INCLUDE_SA=false
    fi

@@ -1,38 +1,114 @@
-openjdk-8 (8u222-b10-1ubuntu1~18.04.1) bionic-security; urgency=medium
+openjdk-8 (8u232-b09-0ubuntu1~18.04.1) bionic-security; urgency=medium
 
   * Backport from Eoan.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 18 Jul 2019 18:52:48 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Wed, 16 Oct 2019 20:38:15 +0000
 
-openjdk-8 (8u222-b10-1ubuntu2) eoan; urgency=medium
+openjdk-8 (8u232-b09-0ubuntu1.1) eoan-security; urgency=high
 
+  * Update to OpenJDK 8u232-b09 (GA). Updated aarch32 to 8u232-b08.
+  * Security fixes:
+    - S8167646: Better invalid FilePermission.
+    - S8213429, CVE-2019-2933: Windows file handling redux.
+    - S8218573, CVE-2019-2945: Better socket support.
+    - S8218877: Help transform transformers.
+    - S8220186: Improve use of font temporary files.
+    - S8220302, CVE-2019-2949: Better Kerberos ccache handling.
+    - S8221497: Optional Panes in Swing.
+    - S8221858, CVE-2019-2958: Build Better Processes.
+    - S8222684, CVE-2019-2964: Better support for patterns.
+    - S8222690, CVE-2019-2962: Better Glyph Images.
+    - S8223163: Better pattern recognition.
+    - S8223505, CVE-2019-2973: Better pattern compilation.
+    - S8223518, CVE-2019-2975: Unexpected exception in jjs.
+    - S8223892, CVE-2019-2978: Improved handling of jar files.
+    - S8224025: Fix for JDK-8220302 is not complete.
+    - S8224532, CVE-2019-2981: Better Path supports.
+    - S8224915, CVE-2019-2983: Better serial attributes.
+    - S8225286, CVE-2019-2987: Better rendering of native glyphs.
+    - S8225292, CVE-2019-2988: Better Graphics2D drawing.
+    - S8225298, CVE-2019-2989: Improve TLS connection support.
+    - S8225597, CVE-2019-2992: Enhance font glyph mapping.
+    - S8226765, CVE-2019-2999: Commentary on Javadoc comments.
+    - S8227129: Better ligature for subtables.
+    - S8227601: Better collection of references.
+    - S8228825, CVE-2019-2894: Enhance ECDSA operations .
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Wed, 16 Oct 2019 00:44:38 +0000
+
+openjdk-8 (8u232-b07-2ubuntu1) eoan; urgency=medium
+
+  * Use the hotspot arch list to select between hotspot and zero as
+    the default VM for autopkgtests. This fixes s390x (zero based)
+    autopkgtest support.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Fri, 11 Oct 2019 13:27:59 +0000
+
+openjdk-8 (8u232-b07-2) unstable; urgency=medium
+
+  * Update to 8u232-b07 (early access build).
+
+  [ Matthias Klose ]
+  * Refresh patches.
+  * openjdk-8-jdk-headless: Add Breaks/Replaces for moved clhsdb binary.
+    LP: #1845873.
+  * debian/tests/control: Depend on g++ instead of build-essential or libc6-dev.
+  * Bump standards vesion.
+
+  [ Tiago Stürmer Daitx ]
   * Improve and fix build tests and autopkgtests:
     - Update debian/tests/hotspot,jdk,langtools to ignore
       jtreg-autopkgtest.sh return code.
     - Create debian/tests/jtdiff-autopkgtest.in as it depends
       on debian/rules variables.
+    - debian/control.in, debian/control: add default-jre-headless
+      to Build-Depends with a nocheck clause as jtreg requires
+      a JRE in /usr/lib/jvm/default-java.
+    - debian/tests/control:
+      + Add zip and unzip test dependencies required by jdk's
+        test/sun/security/tools/jarsigner/diffend.sh and
+        test/sun/security/tools/jarsigner/emptymanifest.sh.
+      + Depend on default-jre-headless so jtreg will use the
+        JRE from /usr/lib/jvm/default-java.
+    - debian/tests/jtdiff-autopkgtest.sh:
+      + Fail only if an actual regression is detected.
+      + Add the super-diff comparison from jtdiff.
+      + Save failed jtr files for all runs.
     - debian/tests/jtreg-autopkgtest.sh:
       + Enable retry of failed tests to trim out flaky tests.
       + Fix unbound variable.
-      + Force JT_JAVA otherwise jtreg will look for
-        /usr/lib/jvm/default-java which might not be installed
-        or be the right JVM to use.
       + Keep .jtr files from failed tests only.
-    - debian/tests/jtdiff-autopkgtest.sh:
-      + Fail only if an actual regression is detected.
-      + Force JT_JAVA otherwise jtreg will look for
-        /usr/lib/jvm/default-java which might not be installed
-        or be the right JVM to use.
-      + Add the super-diff comparison from jtdiff.
+    - debian/patches/jdk-problem-list.diff: ignore failing tests
+      that require more investigation.
     - debian/rules:
       + Preserve all JTreport directories in the test output
         directory.
       + Use JDK_DIR instead of JDK_TO_TEST for autopkgtest
         generation.
       + Package all .jtr files from JTwork as jtreg-autopkgtest.sh
-        makes sure it contains only failing tests.
+        makes sure it contains only failed tests.
+  * debian/tests/jdk: add our custom debian/tests/jdk-problem-list.txt to the
+    exclusion list.
+  * debian/tests/jdk-problem-list.txt: custom exclusion rules for jdk tests
+    that fail to run during a build or autopkgtest run.
+  * debian/rules: remove debian/patches/jdk-problem-list.diff.
+  * debian/patches/jdk-problem-list.diff: jtreg allows for extra exclusion
+    files thus there's no need to patch upstream's exclusion list.
+  * debian/tests/control: mark all autopkgtests as flaky.
+  * debian/tests/hotspot-archs: generated by debian/rules, contains a list of
+    archs that supports a hotspot vm.
+  * debian/tests/jdk: run only when the host arch is a hotspot vm - allow
+    override through an environment variable.
+  * debian/rules: update gen-autopkgtests to echo supported hotspot archs.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 18 Jul 2019 18:49:56 +0000
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 01 Oct 2019 13:49:35 +0200
+
+openjdk-8 (8u232-b04-1) experimental; urgency=medium
+
+  * Update to 8u232-b04 (early access build).
+  * Refresh patches.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 06 Sep 2019 18:03:11 +0200
 
 openjdk-8 (8u222-b10-1) unstable; urgency=high
 

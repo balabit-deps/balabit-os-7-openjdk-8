@@ -98,7 +98,7 @@
      s390*)   ZERO_ARCHDEF=S390  ;;
 --- a/common/autoconf/flags.m4
 +++ b/common/autoconf/flags.m4
-@@ -806,6 +806,8 @@ AC_DEFUN_ONCE([FLAGS_SETUP_COMPILER_FLAG
+@@ -827,6 +827,8 @@ AC_DEFUN_ONCE([FLAGS_SETUP_COMPILER_FLAG
      *)
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}${OPENJDK_TARGET_CPU_BITS}"
    esac

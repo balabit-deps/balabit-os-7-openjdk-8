@@ -14,10 +14,8 @@ fi
 
 host_arch="${DEB_HOST_ARCH:-$(dpkg --print-architecture)}"
 
-# force jtreg to use the JDK we depend on instead of default-java
-export JT_JAVA=$(echo /usr/lib/jvm/java-8-openjdk-amd64 | sed "s/-[^-]*$/-$host_arch/")
 if [ -z "${JDK_TO_TEST+x}" ]; then
-  JDK_TO_TEST=$JT_JAVA
+  JDK_TO_TEST=$(echo /usr/lib/jvm/java-8-openjdk-amd64 | sed "s/-[^-]*$/-$host_arch/")
 fi
 
 jtreg_version="$(dpkg-query -W jtreg | cut -f2)"
@@ -102,6 +100,13 @@ for i in 0 1 2 3; do
     ${on_retry:-} $@ \
       && exit_code=0 && break || exit_code=$?
 
+  # copy .jtr files from failed tests for latter debugging
+  find "${jtwork_dir}" -name '*.jtr' -exec egrep -q '^execStatus=[^Pass]' {} \; -printf "%P\n" \
+    | while IF= read -r jtr; do
+        mkdir -p "$(dirname "${output_dir}/JTwork/${jtr}")"
+        cp --update --preserve --backup=numbered "${jtwork_dir}/${jtr}" "${output_dir}/JTwork/$jtr"
+    done
+
   # break if jtdiff reports no difference from previous run
   # also deletes the just created JTreport
   # DISABLED: don't use it for now as flaky tests could still pass given more retries
@@ -109,15 +114,8 @@ for i in 0 1 2 3; do
   #  && rm -rf "${report_dir}" && break
 
   # link latest JTreport to output_dir
-  ln -sf -t "${output_dir}" "$report_path"
+  ln -sf -t "${output_dir}" "${report_path}"
   on_retry="-status:fail,error"
 done
-
-# copy .jtr files from failed tests for latter debugging
-find "${jtwork_dir}" -name '*.jtr' -exec egrep -q '^execStatus=[^Pass]' {} \; -printf "%P\n" \
-  | while IF= read -r jtr; do
-      mkdir -p "$(dirname "${output_dir}/JTwork/${jtr}")"
-      cp "${jtwork_dir}/${jtr}" "${output_dir}/JTwork/$jtr"
-  done
 
 exit $exit_code
