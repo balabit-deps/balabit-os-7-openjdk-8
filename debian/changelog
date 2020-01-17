@@ -1,12 +1,78 @@
-openjdk-8 (8u232-b09-0ubuntu1~18.04.1) bionic-security; urgency=medium
+openjdk-8 (8u242-b08-0ubuntu3~18.04) bionic-security; urgency=medium
 
-  * Backport from Eoan.
+  * Backport from Focal.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Wed, 16 Oct 2019 20:38:15 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Fri, 17 Jan 2020 23:41:21 +0000
 
-openjdk-8 (8u232-b09-0ubuntu1.1) eoan-security; urgency=high
+openjdk-8 (8u242-b08-0ubuntu3) focal; urgency=medium
 
-  * Update to OpenJDK 8u232-b09 (GA). Updated aarch32 to 8u232-b08.
+  * Sync packages with 8u242-b08:
+  * OpenJDK 8u242-b08 build (release).
+    - S8226352, CVE-2020-2590: Improve Kerberos interop capabilities
+    - S8228548, CVE-2020-2593: Normalize normalization for all   
+    - S8224909, CVE-2020-2583: Unlink Set of LinkedHashSets
+    - S8229951, CVE-2020-2601: Better Ticket Granting Services
+    - S8231422, CVE-2020-2604: Better serial filter handling
+    - S8231795, CVE-2020-2659: Enhance datagram socket support
+    - S8234037, CVE-2020-2654: Improve Object Identifier Processing
+    - S8037550: Update RFC references in javadoc to RFC 5280
+    - S8039438: Some tests depend on internal API sun.misc.IOUtils
+    - S8044500: Add kinit options and krb5.conf flags that allow users
+      to obtain renewable tickets and specify ticket lifetimes
+    - S8058290: JAAS Krb5LoginModule has suspect ticket-renewal logic,
+      relies on clockskew grace
+    - S8080835: Add blocking bulk read to sun.misc.IOUtils
+    - S8138978: Examine usages of sun.misc.IOUtils
+    - S8139206: Add InputStream readNBytes(int len)
+    - S8183591: Incorrect behavior when reading DER value with
+      Integer.MAX_VALUE length
+    - S8186576: KerberosTicket does not properly handle renewable
+      tickets at the end of their lifetime
+    - S8186831: Kerberos ignores PA-DATA with a non-null s2kparams
+    - S8186884: Test native KDC, Java krb5 lib, and native krb5 lib in
+      one test
+    - S8193832: Performance of InputStream.readAllBytes() could be improved
+    - S8196956: (ch) More channels cleanup
+    - S8201627: Kerberos sequence number issues
+    - S8215032: Support Kerberos cross-realm referrals (RFC 6806)
+    - S8225261: Better method resolutions
+    - S8225279: Better XRender interpolation
+    - S8226719: Kerberos login to Windows 2000 failed with "Inappropriate
+      type of checksum in message"
+    - S8227061: KDC.java test behaves incorrectly when AS-REQ contains a
+      PAData not PA-ENC-TS-ENC
+    - S8227381: GSS login fails with PREAUTH_FAILED
+    - S8227437: S4U2proxy cannot continue because server's TGT cannot be found
+    - S8227758: More valid PKIX processing
+    - S8227816: More Colorful ICC profiles
+    - S8230279: Improve Pack200 file reading
+    - S8230318: Better trust store usage
+    - S8230967: Improve Registry support of clients
+    - S8231129: More glyph images
+    - S8231139: Improved keystore support
+    - S8232381: add result NULL-checking to freetypeScaler.c
+    - S8232419: Improve Registry registration
+    - S8233944: Make KerberosPrincipal.KRB_NT_ENTERPRISE field package private
+    - S8235909: File.exists throws AccessControlException for invalid
+      paths when a SecurityManager is installed
+    - S8236983: [TESTBUG] Remove pointless catch block in
+      test/jdk/sun/security/util/DerValue/BadValue.java
+    - S8236984: Add compatibility wrapper for IOUtils.readFully
+  * Use the hotspot arch list to select between hotspot and zero as
+    the default VM for autopkgtests. This fixes s390x (zero based)
+    autopkgtest support.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Fri, 17 Jan 2020 17:37:33 +0000
+
+openjdk-8 (8u242-b04-1) unstable; urgency=medium
+
+  * Update to 8u242-b04 (early access build).
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 06 Jan 2020 20:59:40 +0100
+
+openjdk-8 (8u232-b09-1) unstable; urgency=high
+
+  * Update to 8u222-b09 (release build).
   * Security fixes:
     - S8167646: Better invalid FilePermission.
     - S8213429, CVE-2019-2933: Windows file handling redux.
@@ -32,17 +98,9 @@ openjdk-8 (8u232-b09-0ubuntu1.1) eoan-security; urgency=high
     - S8226765, CVE-2019-2999: Commentary on Javadoc comments.
     - S8227129: Better ligature for subtables.
     - S8227601: Better collection of references.
-    - S8228825, CVE-2019-2894: Enhance ECDSA operations .
+    - S8228825, CVE-2019-2894: Enhance ECDSA operations.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Wed, 16 Oct 2019 00:44:38 +0000
-
-openjdk-8 (8u232-b07-2ubuntu1) eoan; urgency=medium
-
-  * Use the hotspot arch list to select between hotspot and zero as
-    the default VM for autopkgtests. This fixes s390x (zero based)
-    autopkgtest support.
-
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Fri, 11 Oct 2019 13:27:59 +0000
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 17 Oct 2019 22:41:19 +0200
 
 openjdk-8 (8u232-b07-2) unstable; urgency=medium
 

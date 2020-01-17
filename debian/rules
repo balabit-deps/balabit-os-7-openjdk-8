@@ -1983,19 +1983,20 @@ endif
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u232-ga
+hg_tag			= jdk8u242-b08
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u-shenandoah
-hg_tag_aarch64		= aarch64-shenandoah-jdk8u232-b09
+hg_tag_aarch64		= aarch64-shenandoah-jdk8u242-b07
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
-hg_tag_aarch32		= jdk8u232-b08-aarch32-191010
+hg_tag_aarch32		= jdk8u242-b07-aarch32-200115
 hg_url_aarch32		= http://hg.openjdk.java.net/aarch32-port/$(hg_project_aarch32)
 origdir			= ../openjdk-8-$(package_version).orig
+orig_tarball		= ../openjdk-8_$(package_version).orig.tar.xz
 source_date		:= $(shell dpkg-parsechangelog | sed -n '/^Date: /{s///p;q;}')
 fetch-orig:
 	mkdir -p $(origdir)
@@ -2049,7 +2050,8 @@ dfsg-orig:
 	  tar --clamp-mtime --mtime="$(source_date)" -cJf $(origdir)/$$repo.tar.xz $$repo; \
 	  rm -rf $$repo; \
 	  rm -f $(origdir)/$$repo.tar.bz2; \
-	done
+	done; \
+	tar --clamp-mtime --mtime="$(source_date)" -cJf $(orig_tarball) -C.. $$(basename $(origdir));
 get-orig: fetch-orig dfsg-orig
 
 binary: binary-arch binary-indep
