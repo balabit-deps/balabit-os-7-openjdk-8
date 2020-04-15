@@ -1,13 +1,12 @@
 Source: openjdk-8
 Section: java
 Priority: optional
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-XSBC-Original-Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
+Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
 Uploaders: Matthias Klose <doko@ubuntu.com>
 Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   sharutils, gawk, cpio, pkg-config, procps, wdiff, tzdata,
   xvfb<!nocheck>, xauth<!nocheck>, xfonts-base<!nocheck>, libgl1-mesa-dri [!x32]<!nocheck>, xfwm4<!nocheck>, x11-xkb-utils<!nocheck>, dbus-x11<!nocheck>,
-  jtreg<!nocheck>, testng<!nocheck>, default-jre-headless<!nocheck>, time,
+  jtreg<!nocheck>, testng<!nocheck>, default-jre-headless (>= 2:1.8)<!nocheck>, time,
   fastjar (>= 2:0.96-0ubuntu2),
   autoconf (>= 2.69), automake, autotools-dev, ant, ant-optional,
   g++-7,
@@ -16,7 +15,7 @@ Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   libffi-dev, 
   zlib1g-dev, libattr1-dev, libpng-dev, libjpeg-dev, libgif-dev, libpulse-dev (>= 0.9.12) [!alpha], systemtap-sdt-dev [!sh4],
   libnss3-dev (>= 2:3.17.1), openjdk-8-jdk-headless <cross>, dpkg-dev (>= 1.17.14),
-Standards-Version: 4.4.1
+Standards-Version: 4.5.0
 Homepage: http://openjdk.java.net/
 Vcs-Bzr: http://bazaar.launchpad.net/~openjdk/openjdk/openjdk8
 Vcs-Browser: https://code.launchpad.net/~openjdk/openjdk/openjdk8

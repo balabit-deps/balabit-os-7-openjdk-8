@@ -1,15 +1,117 @@
-openjdk-8 (8u242-b08-0ubuntu3~18.04) bionic-security; urgency=medium
+openjdk-8 (8u252-b09-1~18.04) bionic-security; urgency=medium
 
   * Backport from Focal.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Fri, 17 Jan 2020 23:41:21 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Wed, 15 Apr 2020 18:48:05 +0000
+
+openjdk-8 (8u252-b09-1) unstable; urgency=medium
+
+  * Update to OpenJDK 8u252-b09 (GA). Updated aarch32 to 8u252-b08 (no
+    hotspot changes between b08 and b09).
+  * Security fixes
+    - JDK-8223898, CVE-2020-2754: Forward references to Nashorn
+    - JDK-8223904, CVE-2020-2755: Improve Nashorn matching
+    - JDK-8224541, CVE-2020-2756: Better mapping of serial ENUMs
+    - JDK-8224549, CVE-2020-2757: Less Blocking Array Queues
+    - JDK-8225603: Enhancement for big integers
+    - JDK-8227542: Manifest improved jar headers
+    - JDK-8231415, CVE-2020-2773: Better signatures in XML
+    - JDK-8233250: Better X11 rendering
+    - JDK-8233410: Better Build Scripting
+    - JDK-8234027: Better JCEKS key support
+    - JDK-8234408, CVE-2020-2781: Improve TLS session handling
+    - JDK-8234825, CVE-2020-2800: Better Headings for HTTP Servers
+    - JDK-8234841, CVE-2020-2803: Enhance buffering of byte buffers
+    - JDK-8235274, CVE-2020-2805: Enhance typing of methods
+    - JDK-8236201, CVE-2020-2830: Better Scanner conversions
+    - JDK-8238960: linux-i586 builds are inconsistent as the newly build
+      jdk is not able to reserve enough space for object heap
+  * Other changes
+    - JDK-8005819: Support cross-realm MSSFU
+    - JDK-8022263: use same Clang warnings on BSD as on Linux
+    - JDK-8038631: Create wrapper for awt.Robot with additional functionality
+    - JDK-8047212: runtime/ParallelClassLoading/bootstrap/random/inner-complex
+      assert(ObjectSynchronizer::verify_objmon_isinpool(inf)) failed: monitor
+      is invalid
+    - JDK-8055283: Expand ResourceHashtable with C_HEAP allocation, removal and
+      some unit tests
+    - JDK-8068184: Fix for JDK-8032832 caused a deadlock
+    - JDK-8079693: Add support for ECDSA P-384 and P-521 curves to XML Signature
+    - JDK-8132130: some docs cleanup
+    - JDK-8135318: CMS wrong max_eden_size for check_gc_overhead_limit
+    - JDK-8144445: Maximum size checking in Marlin ArrayCache utility methods
+      is not optimal
+    - JDK-8144446: Automate the Marlin crash test
+    - JDK-8144526: Remove Marlin logging use of deleted internal API
+    - JDK-8144630: Use PrivilegedAction to create Thread in Marlin RendererStats
+    - JDK-8144654: Improve Marlin logging
+    - JDK-8144718: Pisces / Marlin Strokers may generate invalid curves with
+      huge coordinates and round joins
+    - JDK-8166976: TestCipherPBECons has wrong @run line
+    - JDK-8167409: Invalid value passed to critical JNI function
+    - JDK-8181872: C1: possible overflow when strength reducing integer multiply
+       by constant
+    - JDK-8187078: -XX:+VerifyOops finds numerous problems when running JPRT
+    - JDK-8191227: issues with unsafe handle resolution
+    - JDK-8197441: Signature#initSign/initVerify for an invalid
+      private/public key fails with ClassCastException for SunPKCS11 provider
+    - JDK-8204152: SignedObject throws NullPointerException for null keys with
+      an initialized Signature object
+    - JDK-8215756: Memory leaks in the AWT on macOS
+    - JDK-8216472: (se) Stack overflow during selection operation leads to crash
+    - JDK-8219244: NMT: Change ThreadSafepointState's allocation type from
+      mtInternal to mtThread
+    - JDK-8219597: (bf) Heap buffer state changes could provoke unexpected
+      exceptions
+    - JDK-8225128: Add exception for expiring DocuSign root to VerifyCACerts
+      test
+    - JDK-8225130: Add exception for expiring Comodo roots to VerifyCACerts test
+    - JDK-8229022: BufferedReader performance can be improved by using
+      StringBuilder
+    - JDK-8229345: Memory leak due to vtable stubs not being shared on SPARC
+    - JDK-8229872: (fs) Increase buffer size used with getmntent
+    - JDK-8230235: Rendering HTML with empty img attribute and documentBaseKey
+      cause Exception
+    - JDK-8231430: C2: Memory stomp in max_array_length() for T_ILLEGAL type
+    - JDK-8235744: PIT:
+      test/jdk/javax/swing/text/html/TestJLabelWithHTMLText.java times out in
+      linux-x64
+    - JDK-8235904: Infinite loop when rendering huge lines
+    - JDK-8236179: C1 register allocation error with T_ADDRESS
+    - JDK-8237368: Problem with NullPointerException in RMI TCPEndpoint.read
+    - JDK-8240521: Revert backport of 8231584: Deadlock with
+      ClassLoader.findLibrary and System.loadLibrary call
+    - JDK-8241296: Segfault in JNIHandleBlock::oops_do()
+    - JDK-8241307: Marlin renderer should not be the default in 8u252
+  * Build using GCC 9 in unstable. Closes: #944184.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 15 Apr 2020 15:38:21 +0200
+
+openjdk-8 (8u252-b07-1) unstable; urgency=medium
+
+  * Update to 8u252-b07 (early access build).
+  * Update ARM32 and AArch64 hotspot to 8u252-b06.
+  * Build using GCC 9 in recent releases.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 26 Mar 2020 12:57:56 +0100
+
+openjdk-8 (8u242-b08-1) unstable; urgency=medium
+
+  * Merge changes from 8u242-b08-0ubuntu3 back into Debian
+  * Fix nocheck profile (no profile support) for wheezy
+  * Version !nocheck default-jre-headless build dependency
+    to ensure at least Java 8 there as well; avoids needing to
+    install two JREs when building in pre-{stretch,xenial}
+  * Update aarch64 to GA jdk8u242-b08, aarch32 to jdk8u242-ga
+  * Bump Policy
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 06 Feb 2020 19:12:24 +0100
 
 openjdk-8 (8u242-b08-0ubuntu3) focal; urgency=medium
 
-  * Sync packages with 8u242-b08:
   * OpenJDK 8u242-b08 build (release).
     - S8226352, CVE-2020-2590: Improve Kerberos interop capabilities
-    - S8228548, CVE-2020-2593: Normalize normalization for all   
+    - S8228548, CVE-2020-2593: Normalize normalization for all
     - S8224909, CVE-2020-2583: Unlink Set of LinkedHashSets
     - S8229951, CVE-2020-2601: Better Ticket Granting Services
     - S8231422, CVE-2020-2604: Better serial filter handling
@@ -72,7 +174,7 @@ openjdk-8 (8u242-b04-1) unstable; urgency=medium
 
 openjdk-8 (8u232-b09-1) unstable; urgency=high
 
-  * Update to 8u222-b09 (release build).
+  * Update to OpenJDK 8u232-b09 (GA). Updated aarch32 to 8u232-b09.
   * Security fixes:
     - S8167646: Better invalid FilePermission.
     - S8213429, CVE-2019-2933: Windows file handling redux.
@@ -242,7 +344,7 @@ openjdk-8 (8u222-b04-1) experimental; urgency=medium
 
   * Update to 8u222-b04.
   * Update ARM32 to jdk8u212-b04-aarch32-190430.
-  * Fix 32bit zero builds. 
+  * Fix 32bit zero builds.
 
  -- Matthias Klose <doko@ubuntu.com>  Mon, 03 Jun 2019 12:11:07 +0200
 
@@ -407,7 +509,7 @@ openjdk-8 (8u181-b13-2) unstable; urgency=high
     - S8201756: Improve cipher inputs.
     - S8203654: Improve cypher state updates.
     - S8204497: Better formatting of decimals.
-  * debian/patches/jdk-freetypeScaler-crash.diff: removed as this patch causes 
+  * debian/patches/jdk-freetypeScaler-crash.diff: removed as this patch causes
     a memory leak; upstream fixed it in openjdk-7, albeit in a different way.
     Closes: #910672.
 
@@ -1223,7 +1325,7 @@ openjdk-8 (8u66-b01-2) unstable; urgency=medium
     LP: #1448548.
   * Define _alpha_ / _sh_ preprocessor macros instead of alpha / sh.
   * Fix jdk gensrc build on x32.
-  * Re-enable the atk bridge for releases with a fixed atk bridge. 
+  * Re-enable the atk bridge for releases with a fixed atk bridge.
   * Really apply the 32bit detection patch. Closes: #787072.
   * Make derivatives builds the same as the parent distro. Closes: #797665.
   * Add m68k support for Zero (Andreas Schwab).
@@ -2365,7 +2467,7 @@ openjdk-7 (7~u3-2.1.1-1) unstable; urgency=medium
     - debian/patches/gcc-4.7.diff
 
   [ James Page ]
-  * Cherry picked patch from openjdk-6 to fix handling of 
+  * Cherry picked patch from openjdk-6 to fix handling of
     ICC profiles (LP: #888123, #888129) (Closes: #676351).
 
   [ Damien Raude-Morvan ]
@@ -2450,7 +2552,7 @@ openjdk-7 (7~u3-2.1-2) unstable; urgency=low
 
   [ Matthias Klose ]
   * Use NanumMyeongjo as the preferred korean font. LP: #792471.
-  * Fix crash in java.net.NetworkInterface.getNetworkInterfaces() when 
+  * Fix crash in java.net.NetworkInterface.getNetworkInterfaces() when
     ifr_ifindex exceeds 255. LP: #925218. S7078386.
   * Use IPAfont as the preferred japanesse font. Closes: #646054.
   * Build using gcj on alpha and armel. Closes: #655750.
@@ -3346,7 +3448,7 @@ openjdk-6 (6b18-1.8-4) unstable; urgency=low
   * Fix Vcs-Bzr location. Closes: #530883.
   * Search for unversioned llvm-config tool.
   * Don't set XFILESEARCHPATH and NLSPATH on startup. LP: #586641.
-  * Fix chinese font metrics and prefer using 'WenQuanYi Micro Hei' font. 
+  * Fix chinese font metrics and prefer using 'WenQuanYi Micro Hei' font.
     LP: #472845.
   * Strip libjvm.so with --strip-debug instead of --strip-unneeded.
     LP: #574997.
@@ -3424,7 +3526,7 @@ openjdk-6 (6b18-1.8-0ubuntu1) lucid; urgency=low
     While libnss3.so gets loaded from /usr/lib, the dependent libraries
     are loaded from MOZILLA_FIVE_HOME (See #561216 for the wrong firefox
     config). LP: #561124.
-    Closes as well: LP: #551328, #554909, #560829, #549010, #553452. 
+    Closes as well: LP: #551328, #554909, #560829, #549010, #553452.
   * Always build shark with hs14.
 
  -- Matthias Klose <doko@ubuntu.com>  Wed, 14 Apr 2010 01:53:33 +0200
@@ -4329,7 +4431,7 @@ openjdk-6 (6b13~pre1-0ubuntu1) jaunty; urgency=low
   * Update IcedTea build infrastructure (20081111).
     - Fix freeze in midi app, LP: #275672.
     - Fixes in the IcedTeaPlugin: LP: #282570, LP: #282570, LP: #285729,
-      LP: #291377, LP: #37330, LP: #239533. 
+      LP: #291377, LP: #37330, LP: #239533.
     - Fix vertical text metrics with freetype scaler. LP: #289784.
   * Build-depend on ecj-gcj instead of ecj on architectures using
     gij/gcj as the bootstrap system.
@@ -4346,7 +4448,7 @@ openjdk-6 (6b12-1~exp1) experimental; urgency=low
 openjdk-6 (6b12-0ubuntu6) intrepid; urgency=low
 
   * Make the dependency on ca-certificates-java unversioned.
-  * Merge from IcedTea: 
+  * Merge from IcedTea:
     - plugin/icedtea/netscape/javascript/JSObject.java: Make
       long constructor public.
 
@@ -4362,7 +4464,7 @@ openjdk-6 (6b12-0ubuntu5) intrepid; urgency=low
   * Configure with --pkgversion=<package version> to encode the package
     version in the -version output and in vm dumps.
   * cacao: Handle VM options Xverify:all and Xverify:none.
-  
+
  -- Matthias Klose <doko@ubuntu.com>  Fri, 24 Oct 2008 13:39:29 +0200
 
 openjdk-6 (6b12-0) experimental; urgency=low
@@ -4889,7 +4991,7 @@ openjdk-6 (6b06-0ubuntu3) hardy; urgency=low
     tests taken from the Fedora package).
   * Keep a backup of the `generated' directory; some files are regenerated
     differently, increasing the size of the diff.
-  
+
  -- Matthias Klose <doko@ubuntu.com>  Thu, 06 Mar 2008 10:05:39 +0100
 
 openjdk-6 (6b06-0ubuntu2) hardy; urgency=low
@@ -4916,7 +5018,7 @@ openjdk-6 (6b05-0ubuntu1) hardy; urgency=low
 
 icedtea-java7 (7~b24-1.5+20080118-2) UNRELEASED; urgency=low
 
-  * Fix removal of alternatives. 
+  * Fix removal of alternatives.
 
  -- Matthias Klose <doko@ubuntu.com>  Sat, 26 Jan 2008 18:41:40 +0100
 
@@ -5002,7 +5104,7 @@ icedtea-java7 (7~b23-1.5~20071124-1) hardy; urgency=low
 
 icedtea-java7 (7~b22-1.5~20071018-0ubuntu3) hardy; urgency=low
 
-  * Revert the previous change, require 7~b22 versions again. 
+  * Revert the previous change, require 7~b22 versions again.
 
  -- Matthias Klose <doko@ubuntu.com>  Sat, 20 Oct 2007 14:33:26 +0000
 
@@ -5125,4 +5227,3 @@ icedtea (7~b14-20070704-1) unstable; urgency=low
   * Initial version.
 
  -- Michael Koch <konqueror@gmx.de>  Wed, 04 Jul 2007 08:25:31 -0100
-

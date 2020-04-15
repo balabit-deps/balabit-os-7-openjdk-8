@@ -269,9 +269,12 @@ else ifneq (,$(filter $(distrel),zesty stretch))
 else ifneq (,$(filter $(distrel),artful bionic))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-7
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-7
-else
+else ifneq (,$(filter $(distrel),buster))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-8
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-8
+else
+  export CC = $(DEB_HOST_GNU_TYPE)-gcc-9
+  export CXX = $(DEB_HOST_GNU_TYPE)-g++-9
 endif
 
 ifneq (,$(filter $(DEB_HOST_ARCH), armel armhf))
@@ -665,8 +668,10 @@ else ifneq (,$(filter $(distrel),stretch zesty))
   bd_gcc = g++-6,
 else ifneq (,$(filter $(distrel),artful bionic))
   bd_gcc = g++-7,
-else
+else ifneq (,$(filter $(distrel),buster))
   bd_gcc = g++-8,
+else
+  bd_gcc = g++-9,
 endif
 bd_syslibs = zlib1g-dev, libattr1-dev,
 ifneq (,$(filter $(distrel),squeeze lucid))
@@ -695,7 +700,7 @@ bd_zero = \
 bd_zero = \
 	$(pkg_ffidev),
 
-ifeq (,$(filter $(distrel),precise))
+ifeq (,$(filter $(distrel),precise wheezy))
   nocheck_profile = <!nocheck>
 endif
 
@@ -1339,7 +1344,7 @@ endif
 
 	chmod -R u+w $(d)
 
-	: # use javaws from icedtea-netx 
+	: # use javaws from icedtea-netx
 	find $(d) -name 'javaws*' | xargs -r rm -f
 
 	: # install default jvm config file
@@ -1983,17 +1988,17 @@ endif
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u242-b08
+hg_tag			= jdk8u252-b09
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u-shenandoah
-hg_tag_aarch64		= aarch64-shenandoah-jdk8u242-b07
+hg_tag_aarch64		= aarch64-shenandoah-jdk8u252-b09
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
-hg_tag_aarch32		= jdk8u242-b07-aarch32-200115
+hg_tag_aarch32		= jdk8u252-b08-aarch32-20200327
 hg_url_aarch32		= http://hg.openjdk.java.net/aarch32-port/$(hg_project_aarch32)
 origdir			= ../openjdk-8-$(package_version).orig
 orig_tarball		= ../openjdk-8_$(package_version).orig.tar.xz
