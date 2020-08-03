@@ -19,5 +19,5 @@
  CFLAGS += $(EXTRA_CFLAGS)
 +CXXFLAGS += $(EXTRA_CXXFLAGS)
  LFLAGS += $(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)
+ ASFLAGS += $(EXTRA_ASFLAGS)
  
- # Don't set excutable bit on stack segment

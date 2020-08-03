@@ -8,7 +8,7 @@
 +    char line[MAXPATHLEN+30];
      int cnt = 0;
      int lineno = 0;
-     jlong start, end;
+     jlong start = 0, end = 0;
 @@ -1739,6 +1739,10 @@ ReadKnownVMs(const char *jvmCfgName, jbo
  
      jvmCfg = fopen(jvmCfgName, "r");

@@ -11,26 +11,6 @@
      static  Elf32_Half running_arch_code=EM_X86_64;
    #elif  (defined IA64)
      static  Elf32_Half running_arch_code=EM_IA_64;
---- a/jdk/src/solaris/native/java/net/PlainDatagramSocketImpl.c
-+++ b/jdk/src/solaris/native/java/net/PlainDatagramSocketImpl.c
-@@ -41,7 +41,6 @@
- #endif
- #ifdef __linux__
- #include <unistd.h>
--#include <sys/sysctl.h>
- #include <sys/utsname.h>
- #include <netinet/ip.h>
- 
---- a/jdk/src/solaris/native/java/net/PlainSocketImpl.c
-+++ b/jdk/src/solaris/native/java/net/PlainSocketImpl.c
-@@ -43,7 +43,6 @@
- #endif
- #ifdef __linux__
- #include <unistd.h>
--#include <sys/sysctl.h>
- #endif
- 
- #include "jvm.h"
 --- a/common/autoconf/platform.m4
 +++ b/common/autoconf/platform.m4
 @@ -31,10 +31,17 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU

@@ -82,8 +82,8 @@ trap "cleanup" EXIT INT TERM ERR
 jtwork_dir="${AUTOPKGTEST_TMP}/${testsuite}/JTwork"
 output_dir="${AUTOPKGTEST_ARTIFACTS}/${testsuite}/"
 
-# retry tests with "fail" or "error" status at most 3 times
-for i in 0 1 2 3; do
+# retry tests with "fail" or "error" status at most 2 times
+for i in 0 1 2; do
   # save each try under its own folder to preserve history
   report_path="${i}/JTreport"
   report_dir="${output_dir}/${report_path}"

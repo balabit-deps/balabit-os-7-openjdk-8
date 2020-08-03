@@ -52,7 +52,7 @@
 --- a/jdk/make/lib/Awt2dLibraries.gmk
 +++ b/jdk/make/lib/Awt2dLibraries.gmk
 @@ -659,8 +659,8 @@ endif
- ##########################################################################################
+ endif
  
  # TODO: Update awt lib path when awt is converted
 -$(eval $(call SetupNativeCompilation,BUILD_LIBLCMS, \

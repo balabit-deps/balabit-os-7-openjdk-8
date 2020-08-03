@@ -1,8 +1,85 @@
-openjdk-8 (8u252-b09-1~18.04) bionic-security; urgency=medium
+openjdk-8 (8u265-b01-0ubuntu2~18.04) bionic-security; urgency=medium
 
-  * Backport from Focal.
+  * Backport from Groovy.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Wed, 15 Apr 2020 18:48:05 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 03 Aug 2020 01:16:56 +0000
+
+openjdk-8 (8u265-b01-0ubuntu2) groovy; urgency=medium
+
+  * Improve build times and autopkgtest runs by ignoring time
+    consuming tests when running on zerovm and armhf systems.
+    - debian/tests/hotspot: exclude slow hotspot tests for
+      zerovm hotspot or armhf machines.
+    - debian/tests/hotspot-problem-list-slow.txt: define a list
+      of long running hotspot tests.
+    - debian/tests/jdk-problem-list.txt: add a list of long
+      running jdk tests for linux-arm (armhf) systems.
+    - debian/tests/jtreg-autopkgtest.in: reduce retries from
+      3 to 2 in order to save time.
+    - debian/tests/jtreg-autopkgtest.sh: regenerated.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Sat, 01 Aug 2020 21:41:17 +0000
+
+openjdk-8 (8u265-b01-0ubuntu1) groovy; urgency=medium
+
+  * Update to 8u265-b01 (GA).
+  * Bug fixes:
+    - JDK-8249677: Regression in 8u after JDK-8237117: Better
+      ForkJoinPool behavior.
+    - JDK-8250546: Expect changed behaviour reported in JDK-8249846.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Sat, 01 Aug 2020 17:50:43 +0000
+
+openjdk-8 (8u262-b10-0ubuntu2) groovy; urgency=medium
+
+  * d/p/jdk-8249677.patch: fix regression introduced by JDK-8237117.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 22 Jul 2020 20:53:08 +0000
+
+openjdk-8 (8u262-b10-0ubuntu1) groovy; urgency=medium
+
+  * Update to 8u262-b10 (GA). Update aarch32 to 8u262-b09 (no
+    hotspot changes between b09 and b10).
+  * Security fixes:
+    - JDK-8028431, CVE-2020-14579: NullPointerException in
+      DerValue.equals(DerValue)
+    - JDK-8028591, CVE-2020-14578: NegativeArraySizeException in
+      sun.security.util.DerInputStream.getUnalignedBitString()
+    - JDK-8237117, CVE-2020-14556: Better ForkJoinPool behavior
+    - JDK-8237592, CVE-2020-14577: Enhance certificate verification
+    - JDK-8238002, CVE-2020-14581: Better matrix operations
+    - JDK-8238920, CVE-2020-14583: Better Buffer support
+    - JDK-8240119, CVE-2020-14593: Less Affine Transformations
+    - JDK-8242136, CVE-2020-14621: Better XML namespace handling
+    - JDK-8230613: Better ASCII conversions
+    - JDK-8231800: Better listing of arrays
+    - JDK-8232014: Expand DTD support
+    - JDK-8233255: Better Swing Buttons
+    - JDK-8234032: Improve basic calendar services
+    - JDK-8234042: Better factory production of certificates
+    - JDK-8234418: Better parsing with CertificateFactory
+    - JDK-8234836: Improve serialization handling
+    - JDK-8236191: Enhance OID processing
+    - JDK-8238804: Enhance key handling process
+    - JDK-8238842: AIOOBE in GIFImageReader.initializeStringTable
+    - JDK-8238843: Enhanced font handing
+    - JDK-8238925: Enhance WAV file playback
+    - JDK-8240482: Improved WAV file playback
+    - JDK-8241379: Update JCEKS support
+    - JDK-8241522: Manifest improved jar headers redux
+  * debian/patches/zero-x32.diff: remove SocketImpl.c hunks which
+    have been applied upstream.
+  * debian/patches/default-jvm-cfg-default.diff: fixed fuzz.
+  * debian/patches/pass-extra-flags.diff: fixed fuzz.
+  * debian/patches/system-lcms.diff: fixed fuzz.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Wed, 24 Jun 2020 21:29:14 +0000
+
+openjdk-8 (8u252-b09-1ubuntu1) focal; urgency=medium
+
+  * Build without atk-wrapper on i386 in focal.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 16 Apr 2020 10:47:49 +0200
 
 openjdk-8 (8u252-b09-1) unstable; urgency=medium
 
