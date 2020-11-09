@@ -1,8 +1,19 @@
-openjdk-8 (8u272-b10-0ubuntu1~18.04) bionic-security; urgency=medium
+openjdk-8 (8u275-b01-0ubuntu1~18.04) bionic-security; urgency=medium
 
   * Backport from Hirsute.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 26 Oct 2020 02:23:20 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 09 Nov 2020 02:38:58 +0000
+
+openjdk-8 (8u275-b01-0ubuntu1) hirsute; urgency=medium
+
+  * Update to 8u275-b01 (GA). Patch aarch32 and aarch64 to 8u275-b01.
+  * Regression fixes:
+    - JDK-8214440: ldap over a TLS connection negotiate failed with "javax.net.ssl.SSLPeerUnverifiedException: hostname of the server '' does not match the hostname in the server's certificate"
+    - JDK-8223940: Private key not supported by chosen signature algorithm
+    - JDK-8236512: PKCS11 Connection closed after Cipher.doFinal and NoPadding
+    - JDK-8250861: Crash in MinINode::Ideal(PhaseGVN*, bool)
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 09 Nov 2020 02:08:45 +0000
 
 openjdk-8 (8u272-b10-0ubuntu1) hirsute; urgency=medium
 
